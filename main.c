@@ -29,6 +29,7 @@ int menu(void);
 void limpaBufferStdin(void);
 int lerInteiro(int min, int max);
 float lerFloat(float min, float max);
+void lerString(char vetor[], int max);
 //Insert and list information on every computer, quantidade de avarias, requezições, prazo de requesição, tipo de utente...
 //List data of every requisition, duration of the requisition, campus where it was returned and bill(ef)...
 
@@ -95,4 +96,18 @@ float lerFloat(float min, float max){
         limpaBufferStdin();
     }while (numero<min || numero>max || controlo==0);
     return numero;
+}
+
+void lerString(char vetor[], int max){
+    int tamanhoString;
+    do{
+        fgets(vetor, max, stdin);
+        tamanhoString = strlen(vetor);
+    }while(tamanhoString == 1);
+    if (vetor[tamanhoString-1] != '\n'){
+            limpaBufferStdin();
+    }
+    else{
+        vetor[tamanhoString-1] ='\0';
+    }
 }
