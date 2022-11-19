@@ -26,7 +26,9 @@ typedef struct something{
 
 //Functions!!
 int menu(void);
-void limpbuff(void);
+void limpaBufferStdin(void);
+int lerInteiro(int min, int max);
+float lerFloat(float min, float max);
 //Insert and list information on every computer, quantidade de avarias, requezições, prazo de requesição, tipo de utente...
 //List data of every requisition, duration of the requisition, campus where it was returned and bill(ef)...
 
@@ -59,7 +61,7 @@ int main(void){
 
 
 
-void limpbuff(void){
+void limpaBufferStdin(void){
     char lix;
     do{
         lix = getchar();
@@ -76,4 +78,21 @@ int menu(void){
     }while(i<=0 );  //|| i>numero);
 }
 
+int lerInteiro(int min, int max){
+    int numero, controlo;
+    do{
+        controlo = scanf("%d", &numero);
+        limpaBufferStdin();
+    }while (numero<min || numero>max || controlo==0);
+    return numero;
+}
 
+float lerFloat(float min, float max){
+    float numero;
+    int controlo;
+    do{
+        controlo = scanf("%f", &numero);
+        limpaBufferStdin();
+    }while (numero<min || numero>max || controlo==0);
+    return numero;
+}
