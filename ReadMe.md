@@ -1,4 +1,4 @@
-workzão!
+Minimamente filtrado, trabalho por acabar!
 
 -Pretende-se elaborar um programa em linguagem C que auxilie na gestão da requisição
 de computadores portáteis pelos membros da comunidade académica do Politécnico. 
