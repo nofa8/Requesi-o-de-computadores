@@ -7,7 +7,7 @@
 #define Algo ...
 
 //Structures for storing the information!
-typedef struct DATA{
+typedef struct DATa{
     //Basic Structure for storing the DAY of something happening!
     int dy;
     char mnth[15];
