@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-#define Algo ...
+//Gloabal Constants 
+#define MAXPOR 30  //Maximum number of computers
 
 //Structures for storing the information!
 typedef struct DATa{
@@ -14,15 +14,38 @@ typedef struct DATa{
     int yer;
 }DATa; 
 
+typedef struct UTENTe{
+    char typeut[16];
+    int numutent;
 
+}UTENTe;
 
-/*
-typedef struct something{
+typedef struct DEv{
+    DATa devol;
+    char local[13];
+    float finee;
+}DEv;
+typedef struct PORTATIl{
+    int portId;
+    char desing[20];
+    char process[12];
+    int  memora;
+    char stat[11];
+    char local[13];
+    DATa aquisition;
+    float valuequi;
+}PORTATIl;
 
-
-
-}something;
-*/
+typedef struct REQUi{
+    char unireqid[15];
+    UTENTe utn;
+    DATa requis;
+    DATa praz;
+    //state of a pc?
+    //estado de requesição
+    char statreq[16];
+    
+}REQUi;
 
 //Functions!!
 int menu(void);
@@ -49,7 +72,7 @@ void lerString(char vetor[], int max);
 //Main function
 int main(void){
     //Variables:
-
+    PORTATIl comp[MAXPOR];
 
     //
     menu();
@@ -71,13 +94,16 @@ void limpaBufferStdin(void){
 
 int menu(void){
     int i, rn;
+    printf("\t\t__Requesiçao de computadores__\n\t()");//COMPLETAR MENU
     do{
-        printf("\t\t__Requesiçao de computadores__\n\t()");
-
-
         i = scanf("%i",&rn);
     }while(i<=0 );  //|| i>numero);
 }
+
+
+
+
+
 
 int lerInteiro(int min, int max){
     int numero, controlo;
