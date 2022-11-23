@@ -27,7 +27,7 @@ typedef struct DEv{
 }DEv;
 typedef struct PORTATIl{
     int portId;
-    char desing[20];
+    char desig[20];
     char process[12];
     int  memora;
     char stat[11];
