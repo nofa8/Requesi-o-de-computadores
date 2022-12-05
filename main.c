@@ -4,55 +4,66 @@
 #include <stdlib.h>
 #include <ctype.h>
 //Gloabal Constants 
-#define MAXPOR 30  //Maximum number of computers
-
+#define maxx 30
 //Structures for storing the information!
-typedef struct DATa{
+typedef struct{
     //Basic Structure for storing the DAY of something happening!
     int dy;
     char mnth[15];
     int yer;
 }DATa; 
 
-typedef struct UTENTe{
-    char typeut[16];
-    int numutent;
-
-}UTENTe;
-
-typedef struct DEv{
-    DATa devol;
-    char local[13];
-    float finee;
-}DEv;
-typedef struct PORTATIl{
+typedef struct{
     int portId;
-    char desig[20];
+    char desing[25];
     char process[12];
     int  memora;
-    char stat[11];
-    char local[13];
-    DATa aquisition;
+    char stat[20];
+    char local[15];
+    DATa aquis;
     float valuequi;
 }PORTATIl;
 
-typedef struct REQUi{
-    char unireqid[15];
-    UTENTe utn;
+typedef struct{
+    PORTATIl portat;
+    char requiscode[15];
     DATa requis;
+    int numpraz;
     DATa praz;
     //state of a pc?
     //estado de requesição
     char statreq[16];
+
+    //Devolução
+    DATa devol;
+    char local[15];
+    float finee;
     
+    //UTENTE STUFF
+    char typeut[16];
+    int numutent;
+    char nomedoutente[40];
 }REQUi;
 
+typedef struct{
+    int portatexist;
+    // Portateis existentes
+    int portatedisp;
+    //Portateis disponiveis
+    int totalderequisefet;
+    // Total de requisiçoes feitas
+    int requisativas;
+    // Requisiçoes ativas
+} CONTADOREs;
+
 //Functions!!
-int menu(void);
+int menu(REQUi requisicoes1[maxx], CONTADOREs *contador1);
 void limpaBufferStdin(void);
 int lerInteiro(int min, int max);
 float lerFloat(float min, float max);
 void lerString(char vetor[], int max);
+void lePortate(REQUi requisicoes2[maxx], CONTADOREs *contador2);
+void nextt(int decisor, REQUi requisicoes3[maxx], CONTADOREs *contador3);
 //Insert and list information on every computer, quantidade de avarias, requezições, prazo de requesição, tipo de utente...
 //List data of every requisition, duration of the requisition, campus where it was returned and bill(ef)...
 
@@ -71,20 +82,49 @@ void lerString(char vetor[], int max);
 
 //Main function
 int main(void){
-    //Variables:
-    PORTATIl comp[MAXPOR];
-
+    //Variables
+    REQUi requisicoes[maxx];
+    CONTADOREs *contador;
+    FILE *fp;
+    int *numerodeportateis, iniciacao;
     //
-    menu();
+    printf("\t\t\t\tGestao de Portateis\n");
+    fp = fopen("iniciacao.dat","rb");
+    fread(&iniciacao,sizeof(int),1,fp);
+    fclose(fp);
+    if(iniciacao!=1){
+        iniciacao = 1;
+        fp = fopen("iniciacao.dat","wb");
+        fwrite(&iniciacao,sizeof(int),1,fp);
+        fclose(fp);
+        printf("\t\tPor favor digite quantos computadores deseja registar: ");
+        *numerodeportateis = lerInteiro(1,30);
+
+    }
+    while(1){
+    menu(requisicoes,&contador);
 
 
 
-    
-       
+            
+    }
+
 }
 
+//Ficheiros______________________________________________________________________________________
+void lePortate(REQUi requisicoes2[maxx], CONTADOREs *contador2){
+    FILE *fp1;
+    fp1 = fopen("portatrequis.dat","rb");
+    if(fp1 !=NULL){
+        fread(requisicoes2,sizeof(PORTATIl),30,fp1);
+    }
+    else{
+        printf("\nErro ao abrir o ficheiro por favor renicie o programa.\n");
+    }
+} //Testar
 
 
+//Buffer Cleaner_________________________________________________________________________________
 void limpaBufferStdin(void){
     char lix;
     do{
@@ -92,19 +132,43 @@ void limpaBufferStdin(void){
     }while(lix!='\n' && lix != EOF);
 }
 
-int menu(void){
+//Menu and stuff_________________________________________________________________________________
+int menu(REQUi requisicoes1[maxx], CONTADOREs *contador1){
     int i, rn;
-    printf("\t\t__Requesiçao de computadores__\n\t()");//COMPLETAR MENU
+    lePortate(requisicoes1, &contador1);
+    
+    printf("\t\t(1)---");
     do{
         i = scanf("%i",&rn);
-    }while(i<=0 );  //|| i>numero);
+    }while(i!=0 && rn<0 || rn>5);
+    nextt(rn, requisicoes1, &contador1);
+}
+
+void nextt(int decisor,REQUi requisicoes3[maxx], CONTADOREs *contador3){
+    switch(decisor){
+        case 1:
+            //Function
+            break;
+        case 2:
+            //Function
+            break;
+        case 3:
+            //Function
+            break;
+        case 4:
+            //Function
+            break;
+        case 5:
+            //Function
+            break;
+        default:printf("Ocorreu um erro!");
+    }
 }
 
 
 
 
-
-
+//Reading_______________________________________________________________________________________
 int lerInteiro(int min, int max){
     int numero, controlo;
     do{
