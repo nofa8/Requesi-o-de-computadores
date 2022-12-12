@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 //Gloabal Constants 
-#define maxx 30
+#define MAXX 30
+#define UM 1
+#define RAM 32
 //Structures for storing the information!
 typedef struct{
     //Basic Structure for storing the DAY of something happening!
@@ -15,9 +17,9 @@ typedef struct{
 
 typedef struct{
     int portId;
-    char desing[25];
+    char desig[25];
     char process[12];
-    int  memora;
+    int  memoria;
     char stat[20];
     char local[15];
     DATa aquis;
@@ -57,13 +59,12 @@ typedef struct{
 } CONTADOREs;
 
 //Functions!!
-int menu(REQUi requisicoes1[maxx], CONTADOREs *contador1);
+char menu(CONTADOREs *quantidadesInicial, PORTATIl pcs[MAXX], REQUi req[MAXX]);
 void limpaBufferStdin(void);
 int lerInteiro(int min, int max);
 float lerFloat(float min, float max);
 void lerString(char vetor[], int max);
-void lePortate(REQUi requisicoes2[maxx], CONTADOREs *contador2);
-void nextt(int decisor, REQUi requisicoes3[maxx], CONTADOREs *contador3);
+char lerChar(void);
 //Insert and list information on every computer, quantidade de avarias, requezições, prazo de requesição, tipo de utente...
 //List data of every requisition, duration of the requisition, campus where it was returned and bill(ef)...
 
@@ -83,45 +84,41 @@ void nextt(int decisor, REQUi requisicoes3[maxx], CONTADOREs *contador3);
 //Main function
 int main(void){
     //Variables
-    REQUi requisicoes[maxx];
-    CONTADOREs *contador;
-    FILE *fp;
-    int *numerodeportateis, iniciacao;
+    REQUi requisicoes[MAXX];
+    PORTATIl portatil1[MAXX];
+    CONTADOREs contador;
+    FILE *fp, *fp1, *fp2;
+    int *numerodeportateis, iniciacao = 1;
+    char opcao, inicicontad;
     //
-    printf("\t\t\t\tGestao de Portateis\n");
-    fp = fopen("iniciacao.dat","rb");
-    fread(&iniciacao,sizeof(int),1,fp);
+    contador.portatedisp = 0;
+    contador.portatexist = 0;
+    contador.totalderequisefet = 0;
+    contador.requisativas = 0;
+    fp1 = fopen("contadore.dat","rb");
+    if(fp1 != NULL){
+        fread(&contador, sizeof(CONTADOREs), 4, fp);
+    }else{
+
+    }
+    fp = fopen("requisicao.dat","rb");
+    if(fp!=NULL){
+        fread(requisicoes, sizeof(REQUi),30, fp);
+    }
+    else{
+        printf("Nao se encontra nenhum ficheiro, recomenda-se listar computadores.\nSe ja existir ficheiro houve um erro ao abrir.\n");
+    }
     fclose(fp);
-    if(iniciacao!=1){
-        iniciacao = 1;
-        fp = fopen("iniciacao.dat","wb");
-        fwrite(&iniciacao,sizeof(int),1,fp);
-        fclose(fp);
-        printf("\t\tPor favor digite quantos computadores deseja registar: ");
-        *numerodeportateis = lerInteiro(1,30);
 
-    }
-    while(1){
-    menu(requisicoes,&contador);
+
+    opcao = menu(&contador,portatil1, requisicoes);
 
 
 
-            
-    }
 
 }
 
 //Ficheiros______________________________________________________________________________________
-void lePortate(REQUi requisicoes2[maxx], CONTADOREs *contador2){
-    FILE *fp1;
-    fp1 = fopen("portatrequis.dat","rb");
-    if(fp1 !=NULL){
-        fread(requisicoes2,sizeof(PORTATIl),30,fp1);
-    }
-    else{
-        printf("\nErro ao abrir o ficheiro por favor renicie o programa.\n");
-    }
-} //Testar
 
 
 //Buffer Cleaner_________________________________________________________________________________
@@ -133,29 +130,85 @@ void limpaBufferStdin(void){
 }
 
 //Menu and stuff_________________________________________________________________________________
-int menu(REQUi requisicoes1[maxx], CONTADOREs *contador1){
-    int i, rn;
-    lePortate(requisicoes1, &contador1);
-    
-    printf("\t\t(1)---");
+char menu(CONTADOREs *quantidadesInicial, PORTATIl pcs[MAXX], REQUi req[MAXX]){
+    char opc, opcasec;
+    int m,e;
+    for(m = 0;m<30;m++){
+        printf("========");
+    }
+    printf("\n=\t\t\t\tGestao de Computadores\n\t\t\t\tMeter aqui cenas\n=\n=\n=\n=");
+    printf("\n=\t\t\t(I)nserir informacao\n");
+    printf("=\t\t\t(L)istar informacao\n");
+    printf("=\t\t\t(A)lteracao em relacao a computadores\n");
+    printf("=\t\t\t(R)equisicao / Devolucao de computadores\n");
+    printf("=\t\t\t(S)air");
+    for(e =0;e<30;e++){
+        printf("========");
+    }
+    printf("\n=\t\tInsira a sua opcao: ");
     do{
-        i = scanf("%i",&rn);
-    }while(i!=0 && rn<0 || rn>5);
-    nextt(rn, requisicoes1, &contador1);
-}
+        limpaBufferStdin();
+        opc = lerChar();
+        if(opc != 'I' && opc != 'L' && opc != 'A' && opc!= 'R' && opc!= 'S'){
+            printf("\nOpcao invalida, insira novamente: ");
+        }
+    
+    }while( opc != 'I' && opc != 'L' && opc != 'A' && opc!= 'R' && opc!= 'S');
+    
+    switch(opc){
+        case 'I':
+            int n, i;
+            for(m = 0;m<30;m++){
+                printf("========");
+            }
+            printf("\n=\t\t\t\tGestao de Computadores\n=\n=\n=\n=");
+            printf("\n=\t\t\tInserir:          \n");
+            printf("=\t\t->(C)omputadores            \n");
+            printf("=\t\t->(A)varias     \n");
+            printf("=\t\t->       \n");
+            printf("=\t\t\t(S)air");
+            for(e =0;e<30;e++){
+                printf("========");
+            }   
+            printf("\n=\t\tInsira a sua opçao: ");
+            do{
+                limpaBufferStdin();
+                opcasec = lerChar();
+                if(opcasec != 'A' && opcasec!= 'C' && opcasec!= 'S'){
+                    printf("\nOpcao invalida, insira novamente: ");
+                }
+            
+            }while(opcasec != 'A' && opcasec!= 'C' && opcasec!= 'S');    
 
-void nextt(int decisor,REQUi requisicoes3[maxx], CONTADOREs *contador3){
-    switch(decisor){
-        case 1:
+
+            // MAXX - pcs ja registados = num max de pcs para registar
+            
+            /*printf("Indique quantos computadores pretende registar: ");
+            n = lerInteiro(1, 5);
+            for(i=0; i<n; i++){
+                printf("Introduza o numero de identificacao: ");
+
+                printf("Introduza a desginacao: ");
+
+                printf("Processador: ");
+                do{
+                    lerString(pcs[i].process , 2);
+                    if(strcmp('i3', pcs[i].process) != 0 && strcmp('i5', pcs[i].process) != 0 && strcmp('i7', pcs[i].process) != 0){
+                        printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
+                    }
+                }while(strcmp('i3', pcs[i].process) != 0 && strcmp('i5', pcs[i].process) != 0 && strcmp('i7', pcs[i].process) != 0);               // repete se nao inserir processador valido 
+
+                printf("Memoria RAM (GB): ");
+                pcs[i].memoria = lerInteiro(UM,RAM);
+            }*/
+            break;
+        case 'L':
             //Function
             break;
-        case 2:
+        case 'A':
             //Function
             break;
-        case 3:
-            //Function
-            break;
-        case 4:
+        case 'R':
             //Function
             break;
         case 5:
@@ -163,7 +216,9 @@ void nextt(int decisor,REQUi requisicoes3[maxx], CONTADOREs *contador3){
             break;
         default:printf("Ocorreu um erro!");
     }
+    
 }
+
 
 
 
@@ -174,6 +229,9 @@ int lerInteiro(int min, int max){
     do{
         controlo = scanf("%d", &numero);
         limpaBufferStdin();
+        if(numero<min || numero>max || controlo==0){
+            printf("Valor invalido. Insira novamente: ");
+        }
     }while (numero<min || numero>max || controlo==0);
     return numero;
 }
@@ -200,4 +258,11 @@ void lerString(char vetor[], int max){
     else{
         vetor[tamanhoString-1] ='\0';
     }
+}
+char lerChar(void){
+    char c;
+    scanf(" %c", &c);
+    c = toupper(c);
+    return c;
+
 }
