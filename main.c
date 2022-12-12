@@ -95,12 +95,17 @@ int main(void){
     contador.portatexist = 0;
     contador.totalderequisefet = 0;
     contador.requisativas = 0;
+
     fp1 = fopen("contadore.dat","rb");
     if(fp1 != NULL){
-        fread(&contador, sizeof(CONTADOREs), 4, fp);
-    }else{
-
+        fread(&contador, sizeof(CONTADOREs), 4, fp1);
     }
+    else{
+        printf("\nErro ao abrir ficheiro, se for a sua primeira vez, ignore!\n");
+    }
+    
+    fclose(fp1);
+    
     fp = fopen("requisicao.dat","rb");
     if(fp!=NULL){
         fread(requisicoes, sizeof(REQUi),30, fp);
@@ -109,13 +114,23 @@ int main(void){
         printf("Nao se encontra nenhum ficheiro, recomenda-se listar computadores.\nSe ja existir ficheiro houve um erro ao abrir.\n");
     }
     fclose(fp);
+    
+    fp2 = fopen("requisicoes.dat", "rb");
+    if(fp2 != NULL){
+        fread(portatil1, sizeof(PORTATIl), 30, fp2);
+    }
+    else{
+        printf("\nErro ao abrir ficheiro, se for a sua primeira vez, ignore!\n");
+    }
+    fclose(fp1);
+    
+    
+    while(1){
+        opcao = menu(&contador,portatil1, requisicoes);
 
 
-    opcao = menu(&contador,portatil1, requisicoes);
 
-
-
-
+    }
 }
 
 //Ficheiros______________________________________________________________________________________
@@ -133,21 +148,20 @@ void limpaBufferStdin(void){
 char menu(CONTADOREs *quantidadesInicial, PORTATIl pcs[MAXX], REQUi req[MAXX]){
     char opc, opcasec;
     int m,e;
-    for(m = 0;m<30;m++){
+    for(m = 0;m<25;m++){
         printf("========");
     }
-    printf("\n=\t\t\t\tGestao de Computadores\n\t\t\t\tMeter aqui cenas\n=\n=\n=\n=");
-    printf("\n=\t\t\t(I)nserir informacao\n");
-    printf("=\t\t\t(L)istar informacao\n");
-    printf("=\t\t\t(A)lteracao em relacao a computadores\n");
-    printf("=\t\t\t(R)equisicao / Devolucao de computadores\n");
+    printf("\n=\t\t\t\tGestao de Computadores\n\t\t\t\tMeter aqui cenas\n=\n=\n=\n=\n=\n=\n=\n=\n=\n=\n=\n=");
+    printf("\n=\t\t\t(I)nserir informacao\n\n=\n=\n=\n=");
+    printf("=\t\t\t(L)istar informacao\n\n=\n=\n=\n=");
+    printf("=\t\t\t(A)lteracao em relacao a computadores\n\n=\n=\n=\n=");
+    printf("=\t\t\t(R)equisicao / Devolucao de computadores\n\n=\n=\n=\n=");
     printf("=\t\t\t(S)air");
     for(e =0;e<30;e++){
         printf("========");
     }
     printf("\n=\t\tInsira a sua opcao: ");
     do{
-        limpaBufferStdin();
         opc = lerChar();
         if(opc != 'I' && opc != 'L' && opc != 'A' && opc!= 'R' && opc!= 'S'){
             printf("\nOpcao invalida, insira novamente: ");
@@ -158,7 +172,7 @@ char menu(CONTADOREs *quantidadesInicial, PORTATIl pcs[MAXX], REQUi req[MAXX]){
     switch(opc){
         case 'I':
             int n, i;
-            for(m = 0;m<30;m++){
+            for(m = 0;m<25;m++){
                 printf("========");
             }
             printf("\n=\t\t\t\tGestao de Computadores\n=\n=\n=\n=");
@@ -166,13 +180,12 @@ char menu(CONTADOREs *quantidadesInicial, PORTATIl pcs[MAXX], REQUi req[MAXX]){
             printf("=\t\t->(C)omputadores            \n");
             printf("=\t\t->(A)varias     \n");
             printf("=\t\t->       \n");
-            printf("=\t\t\t(S)air");
+            printf("=\t\t\t(S)air\n");
             for(e =0;e<30;e++){
                 printf("========");
             }   
             printf("\n=\t\tInsira a sua opçao: ");
             do{
-                limpaBufferStdin();
                 opcasec = lerChar();
                 if(opcasec != 'A' && opcasec!= 'C' && opcasec!= 'S'){
                     printf("\nOpcao invalida, insira novamente: ");
@@ -260,6 +273,8 @@ void lerString(char vetor[], int max){
     }
 }
 char lerChar(void){
+    int contr;
+
     char c;
     scanf(" %c", &c);
     c = toupper(c);
