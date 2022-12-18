@@ -14,7 +14,11 @@
 #define MENOR_ANO 2014
 #define MAIOR_ANO 2021
 #define MAX_DESIG 20
-#define MAX_REQ 9999
+#define MAXIMUS 9999
+#define STAT_REQ "requisitado"
+#define STAT_DISP "disponivel"
+#define STAT_AVA "avariado"
+
 
 //Structures for storing the information!
 typedef struct{
@@ -50,9 +54,9 @@ typedef struct{
     REQUi *requisition;
     int portId;
     char desig[MAX_DESIG];
-    char process[12];
+    char process[3];
     int  memoria;
-    char stat[20];
+    char stat[13];
     int quantAvarias;
     int quantReq;
     char local[15];
@@ -86,14 +90,16 @@ void limpaBufferStdin(void);
 int lerInteiro(int min, int max);
 void lerString(char vetor[], int max);
 float lerFloat(float min, float max);
-void systemClear(void);
 
 
-char menu(CONTADOREs *cont, PORTATIl port[MAXX]);
+char menu(CONTADOREs *cont);
 void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]);
 void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]);
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]);
 void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]);
+
+int lerID(PORTATIl port[MAXX], CONTADOREs *cont);
+int lerDesignacao(PORTATIl port[MAXX], CONTADOREs *cont, int pos);
 
 
 int main()
@@ -108,7 +114,7 @@ int main()
     oscontadores.totalderequisefet = 0;
 
     do{
-        escolha = menu(&oscontadores, portateis);
+        escolha = menu(&oscontadores);
         switch(escolha){
             case 'A':
 
@@ -139,7 +145,7 @@ int main()
 
 
 
-char menu(CONTADOREs *cont, PORTATIl port[MAXX]){
+char menu(CONTADOREs *cont){
     char opcao;
     printf("\n\n==========================Menu Principal==========================\n\n");
     printf("\tQuantidade de portateis: %d", cont->portatexist);
@@ -242,23 +248,47 @@ void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]){
 
 
 void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
-    int i,u;
+    int i, u, desig = 0, aux = 0;
     printf("\nQuantos pcs deseja inserir: ");
     u = lerInteiro(1,MAXX);
-    u += cont->portatexist;
+    u += cont->portatexist;     // se for + q 30 nao deixar inserir
     if(u>30){
-        printf("Nao e possivel adicionar mais computadores.\n");
+        u -= 30;
+        printf("Nao e possivel adicionar mais computadores.\n%d a mais que o limite", u);
     }
     else{
         for(i = (*cont).portatexist; i<u; i++){
-            printf("\nId: ");
-//            lerID(cont,port);
-            printf("\nDesignacao do portatil: ");
+            do{
+                printf("\nId: ");
+                port[i].portId = lerID(port, cont);
+            }while (port[i].portId == -1);
+            do{
+                printf("\nDesignacao do portatil: ");
+                desig = lerDesignacao(port, cont, i);
+            }while(desig == -1);
+
             printf("\n\tProcessador: ");
+            do{
+                lerString(port[i].process , 3);
+                if(strcmp(I3, port[i].process) != 0 && strcmp(I5, port[i].process) != 0 && strcmp(I7, port[i].process) != 0){
+                    printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
+                }
+            }while(strcmp(I3, port[i].process) != 0 && strcmp(I5, port[i].process) != 0 && strcmp(I7, port[i].process) != 0);
+
             printf("\n\tEstado: ");
+            do{
+               lerString(port[i].stat, 13);
+                for(aux = 0; aux < strlen(port[i].stat); aux++){
+                    port[i].stat[aux] = tolower(port[i].stat[aux]);
+                }
+                if(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0){
+                    printf("\nEstado invalido (Avariado, Requisitado, Disponivel). Insira novamente: ");
+                }
+            }while(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0);
             printf("\n\tLocalizacao: ");
             printf("\n\tData de aquisicao: ");
             printf("\n\tValor do equipamento: ");
+            (*cont).portatexist ++;
 
         }
     }
@@ -278,6 +308,7 @@ void limpaBufferStdin(void){
     }
     while (lixo!='\n' && lixo!=EOF);
 }
+
 
 int lerInteiro(int min, int max){
     int numero, controlo;
@@ -321,4 +352,35 @@ void lerString(char vetor[], int max)
         vetor[tamanhoString-1] ='\0'; /*substitui \n da string armazenada em vetor por \0 */
     }
 }
+
+int lerID(PORTATIl port[MAXX], CONTADOREs *cont){         //funcao para verificar se id ja foi inserido
+    int i, id = 0;
+    id = lerInteiro(UM, MAXIMUS);
+    for (i=0; i < (*cont).portatexist; i++){
+        if(id == port[i].portId){
+            id = -1;
+            i = (*cont).portatexist;          //para nao procurar mais pq ja encontrou
+            printf("\nId ja existente.\n");
+        }
+    }
+    return id;
+}
+
+int lerDesignacao(PORTATIl port[MAXX], CONTADOREs *cont, int pos){
+    int i, des = 0;
+    char design[MAX_DESIG];
+    lerString(design, MAX_DESIG);
+    for (i=0; i < (*cont).portatexist; i++){
+        if (strcmp(design, port[i].desig)==0){  //encontrou o codigo no vetor
+            des = -1;
+            i = (*cont).portatexist;
+            printf("\nErro. Designacao ja existente.\n");
+        }
+    }
+    if(des != -1){      // se designacao ainda nao existir
+        strcpy(port[pos].desig, design);
+    }
+    return des;
+}
+
 
