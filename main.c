@@ -58,6 +58,7 @@ typedef struct{
     DATa devol;
     char local[NMAXX];
     float finee;
+    int prazreal;
 
     //UTENTE STUFF
     char typeut[25];
@@ -67,7 +68,7 @@ typedef struct{
 
 
 typedef struct{
-    REQUi *requisition;
+    REQUi requisition[30];
     int portId;
     char desig[MAX_DESIG];
     char process[3];
@@ -111,6 +112,7 @@ int subtrairDatas(DATa d1, DATa d2);
 
 char menu(CONTADOREs *cont,PORTATIl port[MAXX]);
 void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]);
+
 void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]);
 void regRq(CONTADOREs *cont, PORTATIl port[MAXX]);
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]);
@@ -250,7 +252,7 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
         lePortate(cont,port1);
         break;
     case 'T':
-        //listaReq(cont,port1);
+        listaReq(cont,port1);
         break;
     case 'R':
         break;
@@ -353,11 +355,24 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX]){
     }
 }
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]){
-
-
-
-
-
+    int i=0,u=0,o=0;
+    for(i=0; i<cont->portatexist;i++){
+        printf("\nComputador: %s",port[i].desig);
+        for(u=0; u< port[i].quantReq;u++){
+            printf("\n\tData requisicao: %d/%d/%d",port[i].requisition[u].requis.dia,port[i].requisition[u].requis.mes,port[i].requisition[u].requis.ano);
+            printf("\n\tEstado da requisicao: %s",port[i].requisition[u].statreq);
+            if(strcmp(port[i].requisition[u].statreq,STAT_ATIV)==0){
+                printf("\n\tDevolucao: ---");
+                printf("\n\tDuracao da requisicao: ---");
+                printf("\n\tLocal: ---\n\tMulta: ---\n");
+            }
+            else{
+                printf("\n\tDevolucao: %d/%d/%d",port[i].requisition[u].devol.dia,port[i].requisition[u].devol.mes,port[i].requisition[u].devol.ano);
+                printf("\n\tDuracao da  requisicao: %d",port[i].requisition[u].prazreal);
+                printf("\n\tLocal: %s\n\tMulta: %d\n",port[i].requisition[u].local,port[i].requisition[u].finee);
+            }
+        }
+    }
 }
 
 
