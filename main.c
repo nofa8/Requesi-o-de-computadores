@@ -143,6 +143,7 @@ int lerDesignacao( CONTADOREs *cont, PORTATIl port[MAXX], int pos);
 void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX]);
 void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]);
 
+void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]);
 
 int main()
 {
@@ -219,8 +220,13 @@ int main()
             case 'E':
                 lerFicheiroBinario(&oscontadores, portateis);
                 break;
-            case 'Z':
-
+            case 'Z':    //ainda nao testada !!
+                if(oscontadores.portatexist==0){
+                    printf("\nNao existem portateis inseridos. Nao e possivel apresentar estatisticas.\n\n");
+                }
+                else{
+                    dadosEstatisticos(&oscontadores, portateis);
+                }
                 break;
             
             case 'S':
@@ -724,6 +730,45 @@ int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]){
         }
     }
     return ut;
+}
+
+void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so e acionada se houverem pcs
+    int opcao, quant = 0, i;
+    char processador[3];
+    float percentagem;
+    printf("\n\t1 - %% de portateis com um processador\n\t2 - Custo medio de cada multa\n\t3 - Tipo(s) de utente(s) com a menor quantidade de requisicoes efetuadas\n\t4 - Devolucao(coes) mais recente(s)\n\t0 - Sair\n");
+    printf("\t\tOpcao -> ");
+    opcao = lerInteiro(0, 4);
+    switch(opcao){
+
+    case 1:
+        printf("\nIndique o processador: ");
+        do{
+            lerString(processador, 3);
+            if(strcmp(I3, processador) != 0 && strcmp(I5, processador) != 0 && strcmp(I7, processador) != 0){
+                printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
+            }
+        }while(strcmp(I3, processador) != 0 && strcmp(I5, processador) != 0 && strcmp(I7, processador) != 0);
+        for(i=0; i < (*cont).portatexist; i++){
+            if(strcmp(processador, port[i].process)==0){
+                quant++;
+            }
+        }
+        percentagem = 100 * quant / ((*cont).portatexist);
+        printf("A percentagem de processadores %s e %.2f.\n", processador, percentagem);
+        break;
+    case 2:
+
+        break;
+    case 3:
+
+        break;
+    case 4:
+
+        break;
+    default:
+        printf("\n\n\n\n");
+    }
 }
 
 int lerDesignacao(CONTADOREs *cont, PORTATIl port[MAXX], int pos){
