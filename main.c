@@ -19,6 +19,9 @@
 #define STAT_REQ "requisitado"
 #define STAT_AVA "avariado"
 
+#define STAT_TEMP "temporaria"
+#define STAT_PERM "permanente"
+
 #define STAT_ATIV "ativo"
 #define STAT_CONC "concluido"
 
@@ -66,17 +69,29 @@ typedef struct{
     char nomedoutente[MAX_NOME];
 }REQUi;
 
+typedef struct{
+    char tipoavaria[NMAXX];
+    DATa dataavaria;
+    //_________________
+    DATa fimavaria;
+    int duracaoavaria;
+} AVARIAs;
 
 typedef struct{
     REQUi *requisition;
+    int quantReq;
+    int indicereq;
+    //______________
     int portId;
     char desig[MAX_DESIG];
     char process[3];
     int  memoria;
-    char stat[NMAXX];
+    //_____________
+    AVARIAs *avarias;
     int quantAvarias;
-    int indicereq;
-    int quantReq;
+    int indiceavarias;
+    char stat[NMAXX];
+    //_______________
     char local[NMAXX];
     DATa aquis;
     float valuequi;
@@ -115,11 +130,13 @@ char menu(CONTADOREs *cont,PORTATIl port[MAXX]);
 void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]);
 
 void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]);
+void regAva(CONTADOREs *cont, PORTATIl port[MAXX], int indice);
+void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice);
 void regRq(CONTADOREs *cont, PORTATIl port[MAXX]);
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]);
 void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]);
 
-int lerID(CONTADOREs *cont, PORTATIl port[MAXX]);
+int lerID(CONTADOREs *cont, PORTATIl port[MAXX], int idtemp);
 int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]);
 int lerDesignacao( CONTADOREs *cont, PORTATIl port[MAXX], int pos);
 
@@ -132,13 +149,14 @@ int main()
     PORTATIl portateis[30];
     CONTADOREs oscontadores;
     char escolha;
-    int i = 0;
+    int i = 0, pc = 0, conf=-1;
     oscontadores.portatexist = 0;
     oscontadores.portatedisp = 0;
     oscontadores.requisativas = 0;
     oscontadores.totalderequisefet = 0;
     for(i = 0;i<MAXX;i++){
         portateis[i].requisition = malloc(20*sizeof(REQUi));
+        portateis[i].avarias = malloc(20*sizeof(AVARIAs));
     }
     
     do{
@@ -154,7 +172,32 @@ int main()
                 regRq(&oscontadores, portateis);
                 break;
             case 'V':
+                if((oscontadores.portatexist == 0)){
+                    printf("\nNao ha computadores, comece por registar computadores!\n");
+                }
+                else{
+                    printf("\n\tId: ");
+                    do{
+                        pc = lerInteiro(UM,MAXIMUS);
+                        conf = lerID(&oscontadores, portateis, pc);
+                        if(conf == -1){
+                            printf("\n\tErro id invalido.Insira novamente: ");
+                        }
+                    }while(conf == -1);
+                    if(strcmp(portateis[conf].stat,STAT_AVA)==0){
+                        regRep(&oscontadores,portateis,conf);
+                        strcpy(portateis[conf].stat,STAT_DISP);
+                        oscontadores.portatedisp++;
 
+                    }
+                    else{
+                        if(strcmp(portateis[conf].stat,STAT_DISP)==0){
+                            regAva(&oscontadores,portateis,conf);
+                            strcpy(portateis[conf].stat,STAT_AVA);
+                            oscontadores.portatedisp--;
+                        }
+                    }
+                }
                 break;
             case 'D':
 
@@ -257,6 +300,7 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
         listaReq(cont,port1);
         break;
     case 'R':
+        //searchReq();
         break;
     case 'A':
         break;
@@ -291,6 +335,54 @@ void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]){
     else{
         printf("\nNao ha computadores!\n");
     }
+}
+
+void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice){
+    char conf = 'S';
+    if(strcmp(port[indice].avarias[port[indice].indiceavarias].tipoavaria,STAT_PERM)==0){
+        printf("\n\tTipo de avaria permanente.Deseja continuar(S/N)");
+        do{
+            conf = getchar();
+            conf = toupper(conf);
+        }while(conf!='S'&&conf!='N');
+    }
+    if(conf =='S'){
+        do{
+            port[indice].avarias[port[indice].indiceavarias].fimavaria = lerData();
+            if(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano <  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano || (port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes <  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes)||(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes && port[indice].avarias[port[indice].indiceavarias].fimavaria.dia <  port[indice].avarias[port[indice].indiceavarias].dataavaria.dia)){
+                printf("\nData invalida.Data: ");
+            }
+        }while(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano <  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano || (port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes <  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes)||(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes && port[indice].avarias[port[indice].indiceavarias].fimavaria.dia <  port[indice].avarias[port[indice].indiceavarias].dataavaria.dia));
+        port[indice].avarias[port[indice].indiceavarias].duracaoavaria = subtrairDatas(port[indice].avarias[port[indice].indiceavarias].dataavaria, port[indice].avarias[port[indice].indiceavarias].fimavaria);
+    }
+
+}
+
+
+void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int indice){
+    int i=0,u=0;
+    printf("\n\tTipo de avaria: ");
+    do{
+        lerString(port[indice].avarias[port[indice].quantAvarias].tipoavaria, 15);
+        for(i = 0; i<strlen(port[indice].avarias[port[indice].quantAvarias].tipoavaria);i++){
+            port[indice].avarias[port[indice].quantAvarias].tipoavaria[i] = tolower(port[indice].avarias[port[indice].quantAvarias].tipoavaria[i]);
+        }
+        if(strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_TEMP)!= 0 && strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_PERM)!= 0){
+            printf("\nErro tipo de avaria invalido (temporaria ou permanente).Insira novamente: ");
+        }
+    }while(strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_TEMP)!= 0 && strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_PERM)!= 0);
+    
+    printf("\n\tData de avaria: ");
+    do{
+        port[indice].avarias[port[indice].quantAvarias].dataavaria = lerData();
+        if(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano < port[indice].aquis.ano ||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes < port[indice].aquis.mes)||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes == port[indice].aquis.mes && port[indice].avarias[port[indice].quantAvarias].dataavaria.dia < port[indice].aquis.dia)){
+            printf("\n\tErro, dia de avaria nao pode ser inferior ao dia de aquisicao.\n\t\tData:");
+        }
+    }while(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano < port[indice].aquis.ano ||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes < port[indice].aquis.mes)||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes == port[indice].aquis.mes && port[indice].avarias[port[indice].quantAvarias].dataavaria.dia < port[indice].aquis.dia));
+
+    port[indice].quantAvarias++;
+    port[indice].indiceavarias++;
+
 }
 
 void regRq(CONTADOREs *cont, PORTATIl port[MAXX]){
@@ -411,7 +503,7 @@ void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]){
 
 
 void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
-    int i,u,desig=0, aux = 0;
+    int i,u,desig=0, aux = 0,prob = -1, tempid = -1;
     printf("\nQuantos pcs deseja inserir: ");
     u = lerInteiro(0,MAXX);
     u += cont->portatexist;
@@ -421,12 +513,17 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
     }
     else{
         for(i = (*cont).portatexist; i<u; i++){
-            
+            port[i].quantAvarias = 0;
+            port[i].indiceavarias = -1;
+            printf("\n\n\tId: ");
             do{    
-                printf("\nId: ");
-                port[i].portId = lerID(cont,port);
-            }while(port[i].portId == -1);
-            
+                tempid = lerInteiro(UM,MAXIMUS);
+                prob = lerID(cont,port,tempid);
+                if(prob != -1){
+                    printf("\nID invalido, ja existe!\n");
+                }
+            }while(prob != -1);
+            port[i].portId = tempid;
             
             do{   
                 printf("\nDesignacao do portatil: ");
@@ -441,27 +538,9 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
                 }
             }while(strcmp(I3, port[i].process) != 0 && strcmp(I5, port[i].process) != 0 && strcmp(I7, port[i].process) != 0);
             
-            printf("\n\tEstado: ");
-            do{
-               lerString(port[i].stat,NMAXX);
-                for(aux = 0; aux < strlen(port[i].stat); aux++){
-                    port[i].stat[aux] = tolower(port[i].stat[aux]);
-                }
-                if(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0){
-                    printf("\nEstado invalido (avariado, requisitado, disponivel). Insira novamente: ");
-                    
-                }
-            }while(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0);
-        
-            printf("\n\tQuantidade de avarias: ");
-            do{
-                port[i].quantAvarias  =   lerInteiro(0,MAXIMUS);
-                if(strcmp(STAT_AVA, port[i].stat)==0 && port[i].quantAvarias==0){
-                    printf("\nErro nao pode ter 0 avarias e estar avariado.Tente de novo: ");
-                }
-            }while(strcmp(STAT_AVA, port[i].stat)==0 && port[i].quantAvarias==0);
-            printf("\n\tLocalizacao: ");
             
+
+            printf("\n\tLocalizacao: ");
             do{
                 lerString(port[i].local,NMAXX);
                 for(aux = 0; aux < strlen(port[i].local); aux++){
@@ -475,12 +554,27 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
             printf("\n\tData de aquisicao: ");
             port[i].aquis = lerData();
             
+            printf("\n\tEstado: ");
+            do{
+               lerString(port[i].stat,NMAXX);
+                for(aux = 0; aux < strlen(port[i].stat); aux++){
+                    port[i].stat[aux] = tolower(port[i].stat[aux]);
+                }
+                if(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0){
+                    printf("\nEstado invalido (avariado, requisitado, disponivel). Insira novamente: ");
+                    
+                }
+            }while(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0);
+            if(strcmp(STAT_AVA, port[i].stat)==0){
+                regAva(cont, port, i);
+            }
+            
             printf("\n\tValor do equipamento: ");
             port[i].valuequi = lerFloat(MAXX,MAXIMUS);
             
             port[i].quantReq = 0;
             port[i].indicereq = -1;
-            (*cont).portatexist = i ;
+            (*cont).portatexist = i + 1 ;
 
         }
         (*cont).portatexist = i ;
@@ -586,14 +680,12 @@ void limpaBufferStdin(void){
     while (lixo!='\n' && lixo!=EOF);
 }
 
-int lerID(CONTADOREs *cont, PORTATIl port[MAXX]){
-    int i, id=0;
-    id = lerInteiro(UM,MAXIMUS);
+int lerID(CONTADOREs *cont, PORTATIl port[MAXX], int idtemp){
+    int i, id=-1;
     for (i=0; i<(*cont).portatexist; i++){
-        if( id == port[i].portId){
-            id = -1;
+        if( idtemp == port[i].portId){
+            id = i;
             i = (*cont).portatexist;
-            printf("\nID invalido, ja existe!\n");
         }
     }
     return id;
