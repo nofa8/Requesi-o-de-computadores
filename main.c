@@ -760,8 +760,19 @@ void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so 
     case 2:
 
         break;
-    case 3:
-
+    case 3:                                     // ainda nao terminado!!!! /////
+        if( (cont->totalderequisefet) == 0){
+            printf("\nAinda nao foram realizadas requisicoes.\n");
+        }
+        else{
+            int quantEst = 0, quantDoce = 0, quantTec = 0;
+            //indiceEst = ;
+            for(i=0; i < (cont->totalderequisefet); i++){
+                if(strcmp(TIPO_ESTUD, port[i].requisition.typeut) == 0){        //tou na duvida se e preciso [indice] em requisition
+                    quantEst ++;
+                }
+            }
+        }     //NAO TEMOS indice de req para cada tipo de utente (e necessario?)
         break;
     case 4:
 
