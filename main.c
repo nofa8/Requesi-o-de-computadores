@@ -323,7 +323,7 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
         else{
             printf("\n\tDevolucao: %d/%d/%d",port1[conf].requisition[indiceREQ].devol.dia,port1[conf].requisition[indiceREQ].devol.mes,port1[conf].requisition[indiceREQ].devol.ano);
             printf("\n\tDuracao da  requisicao: %d",port1[conf].requisition[indiceREQ].prazreal);
-            printf("\n\tLocal: %s\n\tMulta: %d\n",port1[conf].requisition[indiceREQ].local,port1[conf].requisition[indiceREQ].finee);
+            printf("\n\tLocal: %s\n\tMulta: %f\n",port1[conf].requisition[indiceREQ].local,port1[conf].requisition[indiceREQ].finee);
         }
         printf("\n\tTipo de utente: %s.\n\tNumero de utente: %d.\n\tNome de utente: %s",port1[conf].requisition[indiceREQ].typeut,port1[conf].requisition[indiceREQ].numutent,port1[conf].requisition[indiceREQ].nomedoutente);
         break;
@@ -477,20 +477,25 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX]){
                         }while(u == -1);
                         //Data Requisição
                         printf("\nData de Requisicao: ");
-                        port[indice].requisition[port[indice].quantReq].requis = lerData();
+                        do{
+                            port[indice].requisition[port[indice].quantReq].requis = lerData();
+                            if((port[indice].aquis.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes == port[indice].requisition[port[indice].quantReq].requis.mes && port[indice].aquis.dia > port[indice].requisition[port[indice].quantReq].requis.dia)){
+                                printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
+                            }
+                        }while((port[indice].aquis.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes == port[indice].requisition[port[indice].quantReq].requis.mes && port[indice].aquis.dia > port[indice].requisition[port[indice].quantReq].requis.dia));
                         //PRazo e cenas...
                         printf("\nPrazo de Devolucao: ");
                         do{
                             port[indice].requisition[port[indice].quantReq].praz = lerData();
-                            if(!((port[indice].requisition[port[indice].quantReq].praz.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes == port[indice].requisition[port[indice].quantReq].requis.mes&&port[indice].requisition[port[indice].quantReq].praz.dia > port[indice].requisition[port[indice].quantReq].requis.dia))){
+                            if(!((port[indice].requisition[port[indice].quantReq].praz.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes == port[indice].requisition[port[indice].quantReq].requis.mes&&port[indice].requisition[port[indice].quantReq].praz.dia >= port[indice].requisition[port[indice].quantReq].requis.dia))){
                                 printf("\n\tData invalida.\n");
                             }
                             port[indice].requisition[port[indice].quantReq].numpraz = subtrairDatas(port[indice].requisition[port[indice].quantReq].requis,port[indice].requisition[port[indice].quantReq].praz);
-                            if(port[indice].requisition[port[indice].quantReq].numpraz >30){
+                            if(port[indice].requisition[port[indice].quantReq].numpraz >30 ){
                                     date = -1;
                                     printf("\nErro. O prazo maximo sao 30 dias.");
                             }
-                        }while( (date == -1)||(!((port[indice].requisition[port[indice].quantReq].praz.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes == port[indice].requisition[port[indice].quantReq].requis.mes&&port[indice].requisition[port[indice].quantReq].praz.dia > port[indice].requisition[port[indice].quantReq].requis.dia))));
+                        }while( (date == -1)||(!((port[indice].requisition[port[indice].quantReq].praz.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes == port[indice].requisition[port[indice].quantReq].requis.mes&&port[indice].requisition[port[indice].quantReq].praz.dia >= port[indice].requisition[port[indice].quantReq].requis.dia))));
                         //Prazo de devolução tem de ser superior ao dia de requisição
                         
                         
@@ -548,19 +553,21 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX]){
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]){
     int i=0,u=0,o=0;
     for(i=0; i<cont->portatexist;i++){
-        printf("\nComputador: %s",port[i].desig);
-        for(u=0; u< port[i].quantReq;u++){      // requi e um vetor, logo temos de fazer outro for
-            printf("\n\tData requisicao: %d/%d/%d",port[i].requisition[u].requis.dia,port[i].requisition[u].requis.mes,port[i].requisition[u].requis.ano);
-            printf("\n\tEstado da requisicao: %s",port[i].requisition[u].statreq);
-            if(strcmp(port[i].requisition[u].statreq, STAT_ATIV)==0){
-                printf("\n\tDia maximo de Devolucao: %d/%d/%d",port[i].requisition[u].praz.dia,port[i].requisition[u].praz.mes,port[i].requisition[u].praz.ano);
-                printf("\n\tDuracao maxima da requisicao: %d",port[i].requisition[u].numpraz);
-                printf("\n\tLocal: ---\n\tMulta: ---\n");
-            }
-            else{
-                printf("\n\tDevolucao: %d/%d/%d",port[i].requisition[u].devol.dia,port[i].requisition[u].devol.mes,port[i].requisition[u].devol.ano);
-                printf("\n\tDuracao da  requisicao: %d",port[i].requisition[u].prazreal);
-                printf("\n\tLocal: %s\n\tMulta: %d\n",port[i].requisition[u].local,port[i].requisition[u].finee);
+        if(port[i].quantReq != 0){
+            printf("\nComputador: %s",port[i].desig);
+            for(u=0; u< port[i].quantReq;u++){      // requi e um vetor, logo temos de fazer outro for
+                printf("\n\tData requisicao: %d/%d/%d",port[i].requisition[u].requis.dia,port[i].requisition[u].requis.mes,port[i].requisition[u].requis.ano);
+                printf("\n\tEstado da requisicao: %s",port[i].requisition[u].statreq);
+                if(strcmp(port[i].requisition[u].statreq, STAT_ATIV)==0){
+                    printf("\n\tDia maximo de Devolucao: %d/%d/%d",port[i].requisition[u].praz.dia,port[i].requisition[u].praz.mes,port[i].requisition[u].praz.ano);
+                    printf("\n\tDuracao maxima da requisicao: %d",port[i].requisition[u].numpraz);
+                    printf("\n\tLocal: ---\n\tMulta: ---\n");
+                }
+                else{
+                    printf("\n\tDevolucao: %d/%d/%d",port[i].requisition[u].devol.dia,port[i].requisition[u].devol.mes,port[i].requisition[u].devol.ano);
+                    printf("\n\tDuracao da  requisicao: %d",port[i].requisition[u].prazreal);
+                    printf("\n\tLocal: %s\n\tMulta: %d\n",port[i].requisition[u].local,port[i].requisition[u].finee);
+                }
             }
         }
     }
