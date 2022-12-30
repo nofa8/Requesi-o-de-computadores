@@ -72,7 +72,7 @@ typedef struct{
 typedef struct{
     char tipoavaria[NMAXX];
     DATa dataavaria;
-    //_________________
+    //________________
     DATa fimavaria;
     int duracaoavaria;
 } AVARIAs;
@@ -81,10 +81,11 @@ typedef struct{
     REQUi *requisition;
     int quantReq;
     int indicereq;
+    int quantDiasReq;
     //______________
     int portId;
     char desig[MAX_DESIG];
-    char process[3];
+    char process[4]; 
     int  memoria;
     //_____________
     AVARIAs *avarias;
@@ -135,6 +136,9 @@ void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice);
 void regRq(CONTADOREs *cont, PORTATIl port[MAXX]);
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]);
 void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]);
+void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]);
+int procurarReq(CONTADOREs *cont, PORTATIl port[MAXX], int *sitio);
+
 
 int lerID(CONTADOREs *cont, PORTATIl port[MAXX], int idtemp);
 int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]);
@@ -143,14 +147,13 @@ int lerDesignacao( CONTADOREs *cont, PORTATIl port[MAXX], int pos);
 void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX]);
 void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]);
 
-void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]);
 
 int main()
 {
     PORTATIl portateis[30];
     CONTADOREs oscontadores;
     char escolha;
-    int i = 0, pc = 0, conf=-1;
+    int i = 0, pc = 0, conf=-1, confoutro = -1;
     oscontadores.portatexist = 0;
     oscontadores.portatedisp = 0;
     oscontadores.requisativas = 0;
@@ -209,9 +212,6 @@ int main()
             case 'Y':
 
                 break;
-            case 'M':
-
-                break;
             case 'G':
                 gravarFicheiroBinario(oscontadores, portateis);
                 //gravarFicheiroTexto(oscontadores,portateis);
@@ -220,13 +220,8 @@ int main()
             case 'E':
                 lerFicheiroBinario(&oscontadores, portateis);
                 break;
-            case 'Z':    //ainda nao testada !!
-                if(oscontadores.portatexist==0){
-                    printf("\nNao existem portateis inseridos. Nao e possivel apresentar estatisticas.\n\n");
-                }
-                else{
-                    dadosEstatisticos(&oscontadores, portateis);
-                }
+            case 'Z':
+
                 break;
             
             case 'S':
@@ -249,21 +244,20 @@ char menu(CONTADOREs *cont,PORTATIl port[MAXX]){
     printf("\tQuantidade de portateis: %d", cont->portatexist);
     printf("\t\tQuantidade de portateis disponiveis: %d \n\tTotal de requisicoes efetuadas: %d\tQuantidade de requisicoes ativas: %d\n", cont->portatedisp, cont->totalderequisefet, cont->requisativas);
 
-    printf("\nI - Inserir Portateis\n");
+    printf("\nI - Inserir Portateis\n");//s
     printf("L - Listar Informacao\n\n");      //adicionar dados de requisicoes
 
-    printf("R - Registar Requisicao\n");
-    printf("V - Registar Avaria / Reparacao\n");
+    printf("R - Registar Requisicao\n");// s
+    printf("V - Registar Avaria / Reparacao\n"); // s
     printf("D - Registar Devolucao \n\n");
 
     printf("A - Alteracao da Localizacao de um portatil\n");
     printf("Y - Renovar requisicao\n");
-    printf("M - Mostrar dados de Requisicoes\n\n");
 
-    printf("G - Gravar dados nos Ficheiros\n");
-    printf("E - Extrair dados dos Ficheiros\n\n");
-    printf("Z - Apresentacao de dados estatisticos\n");
-    printf("\tS - Sair\n\t\t\tOpcao --> ");
+    printf("G - Gravar dados nos Ficheiros\n"); // s e n
+    printf("E - Extrair dados dos Ficheiros\n\n");//s
+    printf("Z - Apresentacao de dados estatisticos\n");//s quase
+    printf("\tS - Sair\n\t\t\tOpcao --> "); //s
 
     do{
         opcao = getchar();
@@ -279,7 +273,7 @@ char menu(CONTADOREs *cont,PORTATIl port[MAXX]){
     return opcao;
 }
 void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortateis nos ()
-    int i;
+    int i,u,conf = -1,indiceREQ = -1;
     char opcao1;
 
     printf("\n\n\n\n\n\n\n\n==========================Listar Informacao==========================\n\n");
@@ -306,9 +300,75 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
         listaReq(cont,port1);
         break;
     case 'R':
-        //searchReq();
+        printf("\n\tCodigo da requisicao: ");
+        do{
+            conf = procurarReq(cont,port1,&indiceREQ);
+            if(conf == -1){
+                printf("\n\tErro codigo de requisicao invalido.Insira novamente: ");
+            }
+        }while(conf == -1);
+        // port1[conf].requisition[indiceREQ]
+        printf("\n\n\tDesignacao do portatil: %s", port1[conf].desig);
+        printf("\n\tEstado do portatil: %s",port1[conf].stat);
+        //Quantidade total de dias requisitados do pc ou requisicao Falar com a Eunice
+        //voltaremos ...
+        printf("\n\tQuantidade total de dias requisitado: %d dias",port1[conf].quantDiasReq);
+        printf("\n\tData requisicao: %d/%d/%d",port1[conf].requisition[indiceREQ].requis.dia,port1[conf].requisition[indiceREQ].requis.mes,port1[conf].requisition[indiceREQ].requis.ano);
+        printf("\n\tEstado da requisicao: %s",port1[conf].requisition[indiceREQ].statreq);
+        if(strcmp(port1[conf].requisition[indiceREQ].statreq, STAT_ATIV)==0){
+            printf("\n\tDia maximo de Devolucao: %d/%d/%d",port1[conf].requisition[indiceREQ].praz.dia,port1[conf].requisition[indiceREQ].praz.mes,port1[conf].requisition[indiceREQ].praz.ano);
+            printf("\n\tDuracao maxima da requisicao: %d",port1[conf].requisition[indiceREQ].numpraz);
+            printf("\n\tLocal: ---\n\tMulta: ---\n");
+        }
+        else{
+            printf("\n\tDevolucao: %d/%d/%d",port1[conf].requisition[indiceREQ].devol.dia,port1[conf].requisition[indiceREQ].devol.mes,port1[conf].requisition[indiceREQ].devol.ano);
+            printf("\n\tDuracao da  requisicao: %d",port1[conf].requisition[indiceREQ].prazreal);
+            printf("\n\tLocal: %s\n\tMulta: %d\n",port1[conf].requisition[indiceREQ].local,port1[conf].requisition[indiceREQ].finee);
+        }
+        printf("\n\tTipo de utente: %s.\n\tNumero de utente: %d.\n\tNome de utente: %s",port1[conf].requisition[indiceREQ].typeut,port1[conf].requisition[indiceREQ].numutent,port1[conf].requisition[indiceREQ].nomedoutente);
         break;
     case 'A':
+    // dados do portátil, tipo de avaria data da avaria e tempo de duração
+        printf("\n\t\tDados de avarias: ");
+        if(cont->portatexist!=0){
+            for(i=0; i < cont->portatexist; i++){
+                if(port1[i].quantAvarias == 0){
+                    printf("\n\tO Pc, %s (%d) nao tem avarias registadas.",port1[i].desig, port1[i].portId);
+                }
+                else{
+                    printf("\nId: %d\n", port1[i].portId);
+                    printf("Portatil %s: \n", port1[i].desig);
+                    printf("\t\tProcessador: %s", port1[i].process);
+                    printf("\t\t\tEstado: %s\n", port1[i].stat);
+                    printf("\t\tLocalizacao: %s", port1[i].local);
+                    printf("\t\tData de aquisicao: %d / %d / %d\n", port1[i].aquis.dia,port1[i].aquis.mes,port1[i].aquis.ano);
+                    printf("\t\tValor do equipamento: %.2f", port1[i].valuequi);
+                    printf("\tQuantidade de avarias: %d\n", port1[i].quantAvarias);
+                    printf("\t\tQuantidade de requisicoes: %d\n", port1[i].quantReq);
+                    for(u = 0;u < port1[i].quantAvarias; u++){
+                        printf("\n\tTipo de avaria: %s.", port1[i].avarias[u].tipoavaria);
+                        printf("\n\tData de avaria: %d-%d-%d",port1[i].avarias[u].dataavaria.dia,port1[i].avarias[u].dataavaria.mes,port1[i].avarias[u].dataavaria.ano);
+                        if(strcmp(port1[i].avarias[u].tipoavaria,STAT_PERM)==0){
+                            printf("\n\tAvaria permanente");
+                        }
+                        else{
+                            if(u == port1[i].indiceavarias){    //ultima avaria ligada ao estado do pc
+                                if(strcmp(port1[i].stat,STAT_AVA)==0){
+                                    printf("\n\tAvaria continua");
+                                }
+                            }
+                            else{
+                                printf("\n\tFim da avaria: %d-%d-%d",port1[i].avarias[u].fimavaria.dia,port1[i].avarias[u].fimavaria.mes,port1[i].avarias[u].fimavaria.ano);
+                                printf("\n\tDuracao da avaria: %d", port1[i].avarias[u].duracaoavaria);
+                            }
+                        }    
+                    }
+                }
+            }
+        }
+        else{
+            printf("\nNao ha computadores!\n");
+        }
         break;
     case 'S':
         printf("\n\t.\n");
@@ -369,7 +429,7 @@ void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int indice){
     int i=0,u=0;
     printf("\n\tTipo de avaria: ");
     do{
-        lerString(port[indice].avarias[port[indice].quantAvarias].tipoavaria, 15);
+        lerString(port[indice].avarias[port[indice].quantAvarias].tipoavaria, NMAXX);
         for(i = 0; i<strlen(port[indice].avarias[port[indice].quantAvarias].tipoavaria);i++){
             port[indice].avarias[port[indice].quantAvarias].tipoavaria[i] = tolower(port[indice].avarias[port[indice].quantAvarias].tipoavaria[i]);
         }
@@ -385,7 +445,6 @@ void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int indice){
             printf("\n\tErro, dia de avaria nao pode ser inferior ao dia de aquisicao.\n\t\tData:");
         }
     }while(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano < port[indice].aquis.ano ||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes < port[indice].aquis.mes)||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes == port[indice].aquis.mes && port[indice].avarias[port[indice].quantAvarias].dataavaria.dia < port[indice].aquis.dia));
-
     port[indice].quantAvarias++;
     port[indice].indiceavarias++;
 
@@ -538,7 +597,7 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
 
             printf("\n\tProcessador: ");
             do{
-                lerString(port[i].process, 3);
+                lerString(port[i].process, 4);
                 if(strcmp(I3, port[i].process) != 0 && strcmp(I5, port[i].process) != 0 && strcmp(I7, port[i].process) != 0){
                     printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
                 }
@@ -562,7 +621,7 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
             
             printf("\n\tEstado: ");
             do{
-               lerString(port[i].stat,NMAXX);
+                lerString(port[i].stat,NMAXX);
                 for(aux = 0; aux < strlen(port[i].stat); aux++){
                     port[i].stat[aux] = tolower(port[i].stat[aux]);
                 }
@@ -592,6 +651,105 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
         }
     }
     
+}
+
+void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so e acionada se houverem pcs
+    int opcao, quant = 0, i,u=0;
+    char processador[3];
+    float percentagem;
+    printf("\n\t1 - %% de portateis com um processador\n\t2 - Custo medio de cada multa\n\t3 - Tipo(s) de utente(s) com a menor quantidade de requisicoes efetuadas\n\t4 - Devolucao(coes) mais recente(s)\n\t0 - Sair\n");
+    printf("\t\tOpcao -> ");
+    opcao = lerInteiro(0, 4);
+    switch(opcao){
+
+    case 1:
+        printf("\nIndique o processador: ");
+        do{
+            lerString(processador, 3);
+            if(strcmp(I3, processador) != 0 && strcmp(I5, processador) != 0 && strcmp(I7, processador) != 0){
+                printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
+            }
+        }while(strcmp(I3, processador) != 0 && strcmp(I5, processador) != 0 && strcmp(I7, processador) != 0);
+        for(i=0; i < (*cont).portatexist; i++){
+            if(strcmp(processador, port[i].process)==0){
+                quant++;
+            }
+        }
+        percentagem = 100 * quant / ((*cont).portatexist);
+        printf("A percentagem de processadores %s e %.2f.\n", processador, percentagem);
+        break;
+    case 2:
+
+        break;
+    case 3:                                     // ainda nao terminado!!!! /////
+        if( (cont->totalderequisefet) == 0){
+            printf("\nAinda nao foram realizadas requisicoes.\n");
+        }
+        else{
+            int quantEst = 0, quantDoce = 0, quantTec = 0;
+            //indiceEst = ;
+            for(i=0; i < (cont->portatexist); i++){
+                for(u = 0; u < port[i].quantReq; u++){        
+                    if(strcmp(TIPO_ESTUD, port[i].requisition[u].typeut) == 0){       
+                        quantEst ++;
+                    }
+                    if(strcmp(TIPO_DOCE, port[i].requisition[u].typeut) == 0){       
+                        quantDoce ++;
+                    }
+                    if(strcmp(TIPO_ADM, port[i].requisition[u].typeut) == 0){       
+                        quantTec ++;
+                    }
+                }
+            }
+            if(quantEst < quantDoce){
+                if(quantEst < quantTec){
+                    printf("\n\tO tipo de utente em minoria e o estudante: %d requisicao(coes).",quantEst);
+                }
+                else{
+                    if(quantEst > quantTec){
+                        printf("\n\tO tipo de utente em minoria e o tecnico administrativo: %d requisicao(coes).",quantTec);
+                    }
+                    else{
+                        printf("\n\tOs tipos de utente em minoria sao neste caso o tecnico administrativo e o estudante: %d requisicao(coes).",quantTec);
+                    }
+                }
+            }
+            else{
+                if(quantDoce == quantEst){
+                    if(quantEst < quantTec){
+                    printf("\n\tOs tipos de utente em minoria sao o estudante e o docente: %d requisicao(coes).",quantEst);
+                    }
+                    else{
+                        if(quantEst == quantTec){
+                            printf("\n\tOs utentes estudante, docente e tecnico administrativo tem a mesma quantidade de requisicoes : %d requisicao(coes).",quantTec);
+                        }
+                        else{
+                            printf("\n\tO tipo de utente em minoria e o tecnico administrativo: %d requisicao(coes).",quantTec); 
+                        }
+                    }
+                }
+                else{
+                    if(quantDoce < quantTec){
+                        printf("\n\tO tipo de utente em minoria e o docente: %d requisicao(coes).",quantDoce);
+                    }
+                    else{
+                        if(quantDoce == quantTec){
+                            printf("\n\tOs tipos de utente em minoria sao o tecnico administrativo e docente: %d requisicao(coes).",quantTec);
+                        }
+                        else{
+                            printf("\n\tO tipo de utente em minoria e o tecnico administrativo: %d requisicao(coes).",quantTec);
+                        }
+                    }
+                }
+            }
+        }    
+        break;
+    case 4:
+
+        break;
+    default:
+        printf("\n\n\n\n");
+    }
 }
 
 //________________________________________________________________________________________________________________________________________________________________
@@ -653,9 +811,9 @@ void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]){
     }
     else{
         fread(&(*cont),sizeof(CONTADOREs),1,fc);
-        fclose(fc);
+        
     }
-    
+    fclose(fc);
 
     fp = fopen("portateis.dat", "rb");
     if (fp==NULL){
@@ -666,11 +824,12 @@ void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]){
             fread(port,sizeof(PORTATIl),30,fp);
         }
         else{
-            fread(port,sizeof(PORTATIl),(*cont).portatexist,fp);
-            fclose(fp);
+            fread(port,sizeof(PORTATIl),30,fp);
+            
         }
+        
     }
-    
+    fclose(fp);
 }
 
 /*_________________________________________________________________________________________________*/
@@ -732,54 +891,22 @@ int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]){
     return ut;
 }
 
-void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so e acionada se houverem pcs
-    int opcao, quant = 0, i;
-    char processador[3];
-    float percentagem;
-    printf("\n\t1 - %% de portateis com um processador\n\t2 - Custo medio de cada multa\n\t3 - Tipo(s) de utente(s) com a menor quantidade de requisicoes efetuadas\n\t4 - Devolucao(coes) mais recente(s)\n\t0 - Sair\n");
-    printf("\t\tOpcao -> ");
-    opcao = lerInteiro(0, 4);
-    switch(opcao){
+int procurarReq(CONTADOREs *cont, PORTATIl port[MAXX], int *sitio){
+    int i, cod = -1, u;
+    char code[NMAXX];
+    lerString(code, NMAXX);
+    for (i=0; i < (*cont).portatexist; i++){
+        for(u = 0; u < port[i].quantReq; u++) {
+            if (strcmp(port[i].requisition[u].requiscode, code)==0){  
+                cod = i;
+                *sitio = u;
 
-    case 1:
-        printf("\nIndique o processador: ");
-        do{
-            lerString(processador, 3);
-            if(strcmp(I3, processador) != 0 && strcmp(I5, processador) != 0 && strcmp(I7, processador) != 0){
-                printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
-            }
-        }while(strcmp(I3, processador) != 0 && strcmp(I5, processador) != 0 && strcmp(I7, processador) != 0);
-        for(i=0; i < (*cont).portatexist; i++){
-            if(strcmp(processador, port[i].process)==0){
-                quant++;
+                i = (*cont).portatexist;
+                u = port[i].quantReq;
             }
         }
-        percentagem = 100 * quant / ((*cont).portatexist);
-        printf("A percentagem de processadores %s e %.2f.\n", processador, percentagem);
-        break;
-    case 2:
-
-        break;
-    case 3:                                     // ainda nao terminado!!!! /////
-        if( (cont->totalderequisefet) == 0){
-            printf("\nAinda nao foram realizadas requisicoes.\n");
-        }
-        else{
-            int quantEst = 0, quantDoce = 0, quantTec = 0;
-            //indiceEst = ;
-            for(i=0; i < (cont->totalderequisefet); i++){
-                if(strcmp(TIPO_ESTUD, port[i].requisition.typeut) == 0){        //tou na duvida se e preciso [indice] em requisition
-                    quantEst ++;
-                }
-            }
-        }     //NAO TEMOS indice de req para cada tipo de utente (e necessario?)
-        break;
-    case 4:
-
-        break;
-    default:
-        printf("\n\n\n\n");
     }
+    return cod;
 }
 
 int lerDesignacao(CONTADOREs *cont, PORTATIl port[MAXX], int pos){
@@ -890,6 +1017,7 @@ int subtrairDatas(DATa d1, DATa d2){
                             numerodedias1 += 30;
                     }
                 }
+                numerodedias1 += d1.dia;
                 for(numerodemeses = d2.mes; numerodemeses!=0; numerodemeses--){
                     switch(numerodemeses){
                         case 1:
@@ -913,6 +1041,7 @@ int subtrairDatas(DATa d1, DATa d2){
                             numerodedias += 30;
                     }
                 }
+                numerodedias2 += d2.dia;
                 numerodedias += (numerodedias2 - numerodedias1);
             }
 
