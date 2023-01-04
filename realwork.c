@@ -247,8 +247,8 @@ int main()
                                 }
                             }while(strcmp(CAMPUS1 , portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(CAMPUS2, portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(CAMPUS5,portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(RESID, portateis[conf].requisition[portateis[conf].indicereq].local)!=0);
 
-                            if(portateis[conf].requisition[portateis[conf].indicereq].prazreal > portateis[conf].requisition[portateis[conf].indicereq].numpraz){
-                                //50 centimos por dia
+                            if(portateis[conf].requisition[portateis[conf].indicereq].prazreal > portateis[conf].requisition[portateis[conf].indicereq].numpraz){   // se num dias requisitado for maior que o prazo no primeiro dia de requisicao
+                                //10 euros por dia
                                 portateis[conf].requisition[portateis[conf].indicereq].finee = 0.5*(portateis[conf].requisition[portateis[conf].indicereq].prazreal - portateis[conf].requisition[portateis[conf].indicereq].numpraz);
                                 printf("\n\tO valor a pagar e %d€.\n",portateis[conf].requisition[portateis[conf].indicereq].finee);
                             }
