@@ -249,7 +249,7 @@ int main()
 
                             if(portateis[conf].requisition[portateis[conf].indicereq].prazreal > portateis[conf].requisition[portateis[conf].indicereq].numpraz){   // se num dias requisitado for maior que o prazo no primeiro dia de requisicao
                                 //10 euros por dia
-                                portateis[conf].requisition[portateis[conf].indicereq].finee = 0.5*(portateis[conf].requisition[portateis[conf].indicereq].prazreal - portateis[conf].requisition[portateis[conf].indicereq].numpraz);
+                                portateis[conf].requisition[portateis[conf].indicereq].finee = 10*(portateis[conf].requisition[portateis[conf].indicereq].prazreal - portateis[conf].requisition[portateis[conf].indicereq].numpraz);
                                 printf("\n\tO valor a pagar e %d€.\n",portateis[conf].requisition[portateis[conf].indicereq].finee);
                             }
                             else{
