@@ -6,10 +6,9 @@
 #define MAXIMUS 9999
 #define MAXX 30
 #define NMAXX 15
+#define SETE 7
 #define UM 1
 #define ZERO 0
-
-#define RAM 32
 
 #define I3 "i3"
 #define I5 "i5"
@@ -28,7 +27,7 @@
 #define MAX_DESIG 20
 #define MAX_NOME 80
 #define MENOR_ANO 2010
-#define MAIOR_ANO 2023
+#define MAIOR_ANO 2025
 
 #define CAMPUS1 "campus1"
 #define CAMPUS2 "campus2"
@@ -46,12 +45,42 @@ typedef struct{
     int mes;
     int ano;
 }DATa;
-
-
 typedef struct{
+    int quantReq;
+    int indicereq;
+    int quantDiasReq;
+    //______________
+    int portId;
+    char desig[MAX_DESIG];
+    char process[4];
+    int  memoria;
+    //_____________
+    int quantAvarias;
+    char stat[NMAXX];
+    //_______________
+    char local[NMAXX];
+    DATa aquis;
+    float valuequi;
+    //_______________
+    int quantDev;
+    DATa ultimadev;
+}PORTATIl;
+typedef struct{
+    int portid;
+    int indiceport;
+    char tipoavaria[NMAXX];
+    DATa dataavaria;
+    //________________
+    char statavaria[NMAXX];
+    DATa fimavaria;
+    int duracaoavaria;
+} AVARIAs;
+typedef struct{
+    int indiceport;
+    int portid;
     char requiscode[NMAXX];
     DATa requis;
-    int numpraz;     //prazo days
+    int numpraz;     //prazo em dias
     DATa praz;      // prazo requisicao
     //state of a pc?
     //estado de requesição
@@ -60,6 +89,7 @@ typedef struct{
     //Devolução
     DATa devol;
     char local[NMAXX];
+    //Fine = multa
     float finee;
     int prazreal;
 
@@ -68,43 +98,12 @@ typedef struct{
     int numutent;
     char nomedoutente[MAX_NOME];
 }REQUi;
-
-typedef struct{
-    char tipoavaria[NMAXX];
-    DATa dataavaria;
-    //________________
-    DATa fimavaria;
-    int duracaoavaria;
-} AVARIAs;
-
-typedef struct{
-    REQUi *requisition;
-    //REQUi requistion[MAXX];
-    int quantReq;
-    int indicereq;
-    int quantDiasReq;
-    //______________
-    int portId;
-    char desig[MAX_DESIG];
-    char process[4]; 
-    int  memoria;
-    //_____________
-    AVARIAs *avarias;
-    //AVARIAs avarias[MAXX;]
-    int quantAvarias;
-    int indiceavarias;
-    char stat[NMAXX];
-    //_______________
-    char local[NMAXX];
-    DATa aquis;
-    float valuequi;
-}PORTATIl;
-
 typedef struct{
     int portatexist;        // Portateis existentes
     int portatedisp;        //Portateis disponiveis
     int totalderequisefet;  // Total de requisiçoes feitas
     int requisativas;       // Requisiçoes ativas
+    int totaldeavarias;
 } CONTADOREs;
 
 
@@ -128,55 +127,56 @@ void lerString(char vetor[], int max);
 float lerFloat(float min, float max);
 DATa lerData(void);
 int subtrairDatas(DATa d1, DATa d2);
+DATa sumD(DATa d1, int d);
 
 char menu(CONTADOREs *cont,PORTATIl port[MAXX]);
-void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]);
+void subListar(CONTADOREs *cont, PORTATIl port1[MAXX], REQUi *req, AVARIAs *ava);
 
-void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]);
-void regAva(CONTADOREs *cont, PORTATIl port[MAXX], int indice);
-void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice);
-void regRq(CONTADOREs *cont, PORTATIl port[MAXX]);
-void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]);
-void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]);
-void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]);
-int procurarReq(CONTADOREs *cont, PORTATIl port[MAXX], int *sitio);
+void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX], REQUi *req);
+void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava);
+void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice, AVARIAs *ava);
+void regRq(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
+void listaReq(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
+void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava);
+void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
+int procurarReq(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
 
 
 int lerID(CONTADOREs *cont, PORTATIl port[MAXX], int idtemp);
-int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]);
+int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
 int lerDesignacao( CONTADOREs *cont, PORTATIl port[MAXX], int pos);
 
-void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX]);
-void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]);
+void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava);
+void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava);
 
 
 int main()
 {
-    PORTATIl portateis[30];
+    REQUi *req;
+    AVARIAs *ava;
+    req = NULL;
+    ava = NULL;
     CONTADOREs oscontadores;
-    char escolha, outrolocal[NMAXX];
-    int i = 0, pc = 0, confoutro = -1, aux = 0;
+    PORTATIl portateis[MAXX];
+    char escolha, outrolocal[NMAXX],rqcode[NMAXX];
+    int i = 0, pc = 0, confoutro = -1, aux = 0, aux1 = -1,aux2=-1;
     oscontadores.portatexist = 0;
     oscontadores.portatedisp = 0;
     oscontadores.requisativas = 0;
     oscontadores.totalderequisefet = 0;
-    /*for(i = 0;i<MAXX;i++){
-        portateis[i].requisition = malloc(20*sizeof(REQUi));
-        portateis[i].avarias = malloc(20*sizeof(AVARIAs));
-    }*/
-    
+    oscontadores.totaldeavarias =0;
     do{
         int conf = -1;
         escolha = menu(&oscontadores,portateis);
         switch(escolha){
             case 'I':
-                insertPCs(&oscontadores, portateis);
+                insertPCs(&oscontadores, portateis,req,ava);
                 break;
             case 'L':
-                subListar(&oscontadores, portateis);
+                subListar(&oscontadores, portateis, req,ava);
                 break;
             case 'R':
-                regRq(&oscontadores, portateis);
+                regRq(&oscontadores, portateis,req);
                 break;
             case 'V':
                 if((oscontadores.portatexist == 0)){
@@ -195,16 +195,30 @@ int main()
                         printf("\n\tErro portatil requisitado.Nao e possivel registar avaria.");
                     }
                     if(strcmp(portateis[conf].stat,STAT_AVA)==0){
-                        regRep(&oscontadores,portateis,conf);
+                        regRep(&oscontadores,portateis,conf,ava);
                         strcpy(portateis[conf].stat,STAT_DISP);
                         oscontadores.portatedisp++;
 
                     }
                     else{
-                        if(strcmp(portateis[conf].stat,STAT_DISP)==0){
-                            regAva(&oscontadores,portateis,conf);
+                        if(strcmp(portateis[conf].stat,STAT_DISP)==0){  // conf indica o vetor do port
+                            regAva(&oscontadores,portateis,conf,ava);
                             strcpy(portateis[conf].stat,STAT_AVA);
                             oscontadores.portatedisp--;
+                        }
+                        if(strcmp(portateis[conf].stat,STAT_REQ)==0){
+                            regAva(&oscontadores,portateis,conf,ava);
+                            strcpy(portateis[conf].stat,STAT_AVA);
+                            for( i = oscontadores.totalderequisefet; i >=0;i--){
+                                if(req[i].portid == portateis[conf].portId){
+                                    if(strcmp(req[i].statreq,STAT_ATIV)==0){
+                                        strcpy(req[i].statreq,STAT_CONC);
+
+                                    }
+                                    oscontadores.requisativas--;
+                                    i = -1;
+                                }
+                            }
                         }
                     }
                 }
@@ -226,39 +240,53 @@ int main()
                                 printf("\n\tErro id invalido.Insira novamente: ");
                             }
                         }while(conf == -1);
-                        if(strcmp(portateis[conf].requisition[portateis[conf].indicereq].statreq,STAT_ATIV)==0){
-                            printf("\n\tData da devolucao: ");
-                            do{
-                                portateis[conf].requisition[portateis[conf].indicereq].devol = lerData();
-                                portateis[conf].requisition[portateis[conf].indicereq].prazreal = subtrairDatas(portateis[conf].requisition[portateis[conf].indicereq].requis,portateis[conf].requisition[portateis[conf].indicereq].devol);
-                                if(portateis[conf].requisition[portateis[conf].indicereq].prazreal < 0){
-                                    printf("\n\tErro data de devolucao nao pode ser inferior a data de requisicao.\nInsira novamente: ");
-                                }
-                            }while(portateis[conf].requisition[portateis[conf].indicereq].prazreal < 0);
-                            printf("\n\tLocal de devolucao: ");
-                            printf("\n\tLocalizacao: ");
-                            do{
-                                lerString(portateis[conf].requisition[portateis[conf].indicereq].local,NMAXX);
-                                for(aux = 0; aux < strlen(portateis[conf].requisition[portateis[conf].indicereq].local); aux++){
-                                    portateis[conf].requisition[portateis[conf].indicereq].local[aux] = tolower(portateis[conf].requisition[portateis[conf].indicereq].local[aux]);
-                                }
-                                if(strcmp(CAMPUS1 , portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(CAMPUS2, portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(CAMPUS5, portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(RESID, portateis[conf].requisition[portateis[conf].indicereq].local)!=0 ){
-                                    printf("\nLocalizacao invalida (Campus1, Campus2, Campus5 ou Residencias). Insira novamente: ");
-                                }
-                            }while(strcmp(CAMPUS1 , portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(CAMPUS2, portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(CAMPUS5,portateis[conf].requisition[portateis[conf].indicereq].local)!=0 && strcmp(RESID, portateis[conf].requisition[portateis[conf].indicereq].local)!=0);
-
-                            if(portateis[conf].requisition[portateis[conf].indicereq].prazreal > portateis[conf].requisition[portateis[conf].indicereq].numpraz){   // se num dias requisitado for maior que o prazo no primeiro dia de requisicao
-                                //10 euros por dia
-                                portateis[conf].requisition[portateis[conf].indicereq].finee = 10*(portateis[conf].requisition[portateis[conf].indicereq].prazreal - portateis[conf].requisition[portateis[conf].indicereq].numpraz);
-                                printf("\n\tO valor a pagar e %d€.\n",portateis[conf].requisition[portateis[conf].indicereq].finee);
-                            }
-                            else{
-                                portateis[conf].requisition[portateis[conf].indicereq].finee= 0;
-                                printf("\n\tNao ha multa.\n");
+                        pc = -1;
+                        for(aux1 = (oscontadores.totalderequisefet-1);aux1!=0; aux1--){
+                            if(req[aux1].indiceport == conf){
+                                pc = aux1;
+                                //indice do portatil
+                                aux1 = 0;
                             }
                         }
+                        if(pc == -1){
+                            printf("\n\tErro nao ha requisicoes do portatil.\n");
+                        }
                         else{
-                            printf("\n\tErro requisicao concluida.");
+                            if(strcmp(req[pc].statreq,STAT_ATIV)==0){
+                                printf("\n\tData da devolucao: ");
+                                do{
+                                    req[pc].devol = lerData();
+                                    req[pc].prazreal = subtrairDatas(req[pc].requis,req[pc].devol);
+                                    if(req[pc].prazreal < 0){
+                                        printf("\n\tErro data de devolucao nao pode ser inferior a data de requisicao.\nInsira novamente: ");
+                                    }
+                                }while(req[pc].prazreal < 0);
+                                portateis[req[pc].indiceport].ultimadev = req[pc].devol;
+                                portateis[req[pc].indiceport].quantDiasReq +=req[pc].prazreal;
+                                printf("\n\tLocal de devolucao: ");
+                                do{
+                                    lerString(req[pc].local,NMAXX);
+                                    for(aux = 0; aux < strlen(req[pc].local); aux++){
+                                        req[pc].local[aux] = tolower(req[pc].local[aux]);
+                                    }
+                                    if(strcmp(CAMPUS1 , req[pc].local)!=0 && strcmp(CAMPUS2, req[pc].local)!=0 && strcmp(CAMPUS5, req[pc].local)!=0 && strcmp(RESID, req[pc].local)!=0 ){
+                                        printf("\nLocalizacao invalida (Campus1, Campus2, Campus5 ou Residencias). Insira novamente: ");
+                                    }
+                                }while(strcmp(CAMPUS1 , req[pc].local)!=0 && strcmp(CAMPUS2, req[pc].local)!=0 && strcmp(CAMPUS5, req[pc].local)!=0 && strcmp(RESID, req[pc].local)!=0 );
+
+                                if(req[pc].prazreal > req[pc].numpraz){
+                                    //10€ por dia
+                                    req[pc].finee = 10*(req[pc].prazreal - req[pc].numpraz);
+                                    printf("\n\tO valor a pagar e %d€.\n",req[pc].finee);
+                                }
+                                else{
+                                    req[pc].finee= 0;
+                                    printf("\n\tNao ha multa.\n");
+                                }
+                            }
+                            else{
+                                printf("\n\tErro requisicao concluida.");
+                            }
                         }
                     }
                 }
@@ -284,10 +312,10 @@ int main()
                                 outrolocal[aux] = tolower(outrolocal[aux]);
                             }
                             if((strcmp(outrolocal, portateis[conf].local)==0)||(strcmp(CAMPUS1 , outrolocal)!=0 && strcmp(CAMPUS2, outrolocal)!=0 && strcmp(CAMPUS5, outrolocal)!=0 && strcmp(RESID, outrolocal)!=0)){
-                                printf("\nLocalizacao atual ,%s, opcoes: (Campus1, Campus2, Campus5 ou Residencias). Insira novamente: ",portateis[conf].stat);
+                                printf("\nLocalizacao atual - %s. Opcoes: (Campus1, Campus2, Campus5 ou Residencias). Insira novamente: ",portateis[conf].local);
                             }
                         }while((strcmp(outrolocal, portateis[conf].local)==0)||(strcmp(CAMPUS1 , outrolocal)!=0 && strcmp(CAMPUS2, outrolocal)!=0 && strcmp(CAMPUS5, outrolocal)!=0 && strcmp(RESID, outrolocal)!=0));
-                        strcpy(portateis[conf].stat,outrolocal);
+                        strcpy(portateis[conf].local,outrolocal);
                     }
                     else{
                         printf("\n\tErro portatil nao se encontra disponivel!\n\n");
@@ -295,33 +323,59 @@ int main()
                 }
                 break;
             case 'Y':
+                if(oscontadores.portatedisp >0){
+                    printf("\n\tID da requisicao: ");
+                    lerString(rqcode,NMAXX);
+                    for(aux = oscontadores.totalderequisefet-1;aux >=0;aux--){
+                        if(rqcode == req[aux].requiscode){
+                            if(strcmp(portateis[req[aux].indiceport].stat,STAT_REQ)==0){
+                                if(strcmp(req[aux].statreq,STAT_ATIV)==0){
 
+                                    req[aux].requis = sumD(req[aux].requis,SETE);
+                                    req[aux].numpraz = req[aux].numpraz + 7;
+                                    printf("\n\tNova Data Prazo: %d - %d - %d",req[aux].requis.dia,req[aux].requis.mes,req[aux].requis.ano);
+                                    aux = -1;
+                                }
+                                else{
+                                    printf("\n\tErro requisicao concluida.\n");
+                                }
+                            }
+                            else{
+                                printf("\n\tErro portatil nao requisitado!\n");
+                            }
+                        }
+                    }
+                }
+                else{
+                    printf("\n\tNao existem computadores.\n");
+                }
                 break;
             case 'G':
-                gravarFicheiroBinario(oscontadores, portateis);
+                gravarFicheiroBinario(oscontadores, portateis,req,ava);
                 //gravarFicheiroTexto(oscontadores,portateis);
 
                 break;
             case 'E':
-                lerFicheiroBinario(&oscontadores, portateis);
+                lerFicheiroBinario(&oscontadores, portateis,req,ava);
                 break;
             case 'Z':
                 if(oscontadores.portatexist==0){
                     printf("\nNao existem portateis inseridos. Nao e possivel apresentar estatisticas.\n\n");
                 }
                 else{
-                    dadosEstatisticos(&oscontadores, portateis);
+                    dadosEstatisticos(&oscontadores, portateis,req);
                 }
                 break;
-            
+
             case 'S':
                 printf("\nA sair ...\n");
-                
+
         }
     }while(escolha != 'S');
 
 
-
+    free(req);
+    free(ava);
     return 0;
 }
 
@@ -362,7 +416,7 @@ char menu(CONTADOREs *cont,PORTATIl port[MAXX]){
 
     return opcao;
 }
-void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortateis nos ()
+void subListar(CONTADOREs *cont, PORTATIl port1[MAXX], REQUi *req, AVARIAs *ava){
     int i,u,conf = -1,indiceREQ = -1;
     char opcao1;
 
@@ -384,38 +438,41 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
 
     switch(opcao1){
     case 'P':
-        lePortate(cont,port1);
+        lePortate(cont,port1,req);
         break;
     case 'T':
-        listaReq(cont,port1);
+        listaReq(cont,port1,req);
         break;
     case 'R':
-        printf("\n\tCodigo da requisicao: ");
-        do{
-            conf = procurarReq(cont,port1,&indiceREQ);
-            if(conf == -1){
-                printf("\n\tErro codigo de requisicao invalido.Insira novamente: ");
+        if(cont->requisativas != 0){
+            printf("\n\tCodigo da requisicao: ");
+            do{
+                conf = procurarReq(cont,port1,req);
+                if(conf == -1){
+                    printf("\n\tErro codigo de requisicao invalido.Insira novamente: ");
+                }
+            }while(conf == -1);
+            // port1[conf].requisition[indiceREQ]
+            printf("\n\n\tDesignacao do portatil: %s", port1[conf].desig);
+            printf("\n\tEstado do portatil: %s",port1[conf].stat);
+            printf("\n\tQuantidade total de dias requisitado: %d dias",port1[req[conf].indiceport].quantDiasReq);
+            printf("\n\tData requisicao: %d/%d/%d",req[conf].requis.dia,req[conf].requis.mes,req[conf].requis.ano);
+            printf("\n\tEstado da requisicao: %s",req[conf].statreq);
+            if(strcmp(req[conf].statreq, STAT_ATIV)==0){
+                printf("\n\tDia maximo de Devolucao: %d/%d/%d",req[conf].praz.dia,req[conf].praz.mes,req[conf].praz.ano);
+                printf("\n\tDuracao maxima da requisicao: %d",req[conf].numpraz);
+                printf("\n\tLocal: ---\n\tMulta: ---\n");
             }
-        }while(conf == -1);
-        // port1[conf].requisition[indiceREQ]
-        printf("\n\n\tDesignacao do portatil: %s", port1[conf].desig);
-        printf("\n\tEstado do portatil: %s",port1[conf].stat);
-        //Quantidade total de dias requisitados do pc ou requisicao Falar com a Eunice
-        //voltaremos ...
-        printf("\n\tQuantidade total de dias requisitado: %d dias",port1[conf].quantDiasReq);
-        printf("\n\tData requisicao: %d/%d/%d",port1[conf].requisition[indiceREQ].requis.dia,port1[conf].requisition[indiceREQ].requis.mes,port1[conf].requisition[indiceREQ].requis.ano);
-        printf("\n\tEstado da requisicao: %s",port1[conf].requisition[indiceREQ].statreq);
-        if(strcmp(port1[conf].requisition[indiceREQ].statreq, STAT_ATIV)==0){
-            printf("\n\tDia maximo de Devolucao: %d/%d/%d",port1[conf].requisition[indiceREQ].praz.dia,port1[conf].requisition[indiceREQ].praz.mes,port1[conf].requisition[indiceREQ].praz.ano);
-            printf("\n\tDuracao maxima da requisicao: %d",port1[conf].requisition[indiceREQ].numpraz);
-            printf("\n\tLocal: ---\n\tMulta: ---\n");
+            else{
+                printf("\n\tDevolucao: %d/%d/%d",req[conf].devol.dia,req[conf].devol.mes,req[conf].devol.ano);
+                printf("\n\tDuracao da  requisicao: %d",req[conf].prazreal);
+                printf("\n\tLocal: %s\n\tMulta: %f\n",req[conf].local,req[conf].finee);
+            }
+            printf("\n\tTipo de utente: %s.\n\tNumero de utente: %d.\n\tNome de utente: %s",req[conf].typeut,req[conf].numutent,req[conf].nomedoutente);
         }
         else{
-            printf("\n\tDevolucao: %d/%d/%d",port1[conf].requisition[indiceREQ].devol.dia,port1[conf].requisition[indiceREQ].devol.mes,port1[conf].requisition[indiceREQ].devol.ano);
-            printf("\n\tDuracao da  requisicao: %d",port1[conf].requisition[indiceREQ].prazreal);
-            printf("\n\tLocal: %s\n\tMulta: %f\n",port1[conf].requisition[indiceREQ].local,port1[conf].requisition[indiceREQ].finee);
+            printf("\nNao ha requisicoes ativas.\n");
         }
-        printf("\n\tTipo de utente: %s.\n\tNumero de utente: %d.\n\tNome de utente: %s",port1[conf].requisition[indiceREQ].typeut,port1[conf].requisition[indiceREQ].numutent,port1[conf].requisition[indiceREQ].nomedoutente);
         break;
     case 'A':
     // dados do portátil, tipo de avaria data da avaria e tempo de duração
@@ -435,23 +492,25 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
                     printf("\t\tValor do equipamento: %.2f", port1[i].valuequi);
                     printf("\tQuantidade de avarias: %d\n", port1[i].quantAvarias);
                     printf("\t\tQuantidade de requisicoes: %d\n", port1[i].quantReq);
-                    for(u = 0;u < port1[i].quantAvarias; u++){
-                        printf("\n\tTipo de avaria: %s.", port1[i].avarias[u].tipoavaria);
-                        printf("\n\tData de avaria: %d-%d-%d",port1[i].avarias[u].dataavaria.dia,port1[i].avarias[u].dataavaria.mes,port1[i].avarias[u].dataavaria.ano);
-                        if(strcmp(port1[i].avarias[u].tipoavaria,STAT_PERM)==0){
-                            printf("\n\tAvaria permanente");
-                        }
-                        else{
-                            if(u == port1[i].indiceavarias){    //ultima avaria ligada ao estado do pc
-                                if(strcmp(port1[i].stat,STAT_AVA)==0){
-                                    printf("\n\tAvaria continua");
-                                }
+                    for(u = 0;u < cont->totaldeavarias; u++){
+                        if(port1[i].portId == ava[u].portid){       //confirmar que avaria esta associada ao pc escolhido
+                            printf("\n\tTipo de avaria: %s.", ava[u].tipoavaria);
+                            printf("\n\tData de avaria: %d-%d-%d", ava[u].dataavaria.dia, ava[u].dataavaria.mes, ava[u].dataavaria.ano);
+                            if(strcmp(ava[u].tipoavaria,STAT_PERM)==0){
+                                printf("\n\tAvaria permanente");
                             }
                             else{
-                                printf("\n\tFim da avaria: %d-%d-%d",port1[i].avarias[u].fimavaria.dia,port1[i].avarias[u].fimavaria.mes,port1[i].avarias[u].fimavaria.ano);
-                                printf("\n\tDuracao da avaria: %d", port1[i].avarias[u].duracaoavaria);
+                                if(strcmp(ava[u].statavaria,STAT_ATIV)==0){    //ultima avaria ligada ao estado do pc
+                                    if(strcmp(port1[i].stat,STAT_AVA)==0){
+                                        printf("\n\tAvaria continua");
+                                    }
+                                }
+                                else{
+                                    printf("\n\tFim da avaria: %d-%d-%d",ava[u].fimavaria.dia,ava[u].fimavaria.mes,ava[u].fimavaria.ano);
+                                    printf("\n\tDuracao da avaria: %d", ava[u].duracaoavaria);
+                                }
                             }
-                        }    
+                        }
                     }
                 }
             }
@@ -465,8 +524,8 @@ void subListar(CONTADOREs *cont, PORTATIl port1[MAXX]){     //passar quantPortat
         break;
     }
  }
-
-void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]){
+// looks good !!!
+void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX],REQUi *req){
     int i, u;
     if(cont->portatexist!=0){
         for(i=0; i < cont->portatexist; i++){
@@ -480,10 +539,14 @@ void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]){
             printf("\tQuantidade de avarias: %d\n", port2[i].quantAvarias);
             printf("\t\tQuantidade de requisicoes: %d\n", port2[i].quantReq);
             if(port2[i].quantReq == 0){
-                printf("\t\tTipo de utente: ----\tPrazo de requisicao: ---- dias");
+                printf("\t\tTipo de utente: ----\t\tPrazo de requisicao: ---- dias");
             }
             else{
-                printf("\t\tTipo de utente: %15s\tPrazo de requisicao: %d dias", port2[i].requisition[port2[i].indicereq].typeut,port2[i].requisition[port2[i].indicereq].numpraz);
+                for(u = 0; u < cont->totalderequisefet; u++){
+                    if(req[u].portid == port2[i].portId){
+                        printf("\t\tTipo de utente: %15s\tPrazo de requisicao: %d dias\n", req[u].typeut, req[u].numpraz);
+                    }
+                }
             }
         }
 
@@ -493,141 +556,194 @@ void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX]){
     }
 }
 
-void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice){
-    char conf = 'S';
-    if(strcmp(port[indice].avarias[port[indice].indiceavarias].tipoavaria,STAT_PERM)==0){
-        printf("\n\tTipo de avaria permanente.Deseja continuar(S/N)");
-        do{
-            conf = getchar();
-            conf = toupper(conf);
-        }while(conf!='S'&&conf!='N');
+void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice, AVARIAs *ava){     //confirmar valor do indice
+    int i=0;
+    for(i= (cont->totaldeavarias-1); i >=0;i--){
+        if(ava[i].indiceport == indice){
+            indice = i;
+            i = 0;
+            printf("%d",indice);
+        }
     }
-    if(conf =='S'){
+    if(strcmp(ava[indice].tipoavaria,STAT_PERM)==0){
+        printf("\n\tTipo de avaria permanente.\n");
+    }
+    else{
         do{
-            port[indice].avarias[port[indice].indiceavarias].fimavaria = lerData();
-            if(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano <  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano || (port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes <  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes)||(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes && port[indice].avarias[port[indice].indiceavarias].fimavaria.dia <  port[indice].avarias[port[indice].indiceavarias].dataavaria.dia)){
+            ava[indice].fimavaria = lerData();
+            if(ava[indice].fimavaria.ano <  ava[indice].dataavaria.ano || (ava[indice].fimavaria.ano ==  ava[indice].dataavaria.ano && ava[indice].fimavaria.mes <  ava[indice].dataavaria.mes)||(ava[indice].fimavaria.ano ==  ava[indice].dataavaria.ano && ava[indice].fimavaria.mes ==  ava[indice].dataavaria.mes && ava[indice].fimavaria.dia <  ava[indice].dataavaria.dia)){
                 printf("\nData invalida.Data: ");
             }
-        }while(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano <  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano || (port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes <  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes)||(port[indice].avarias[port[indice].indiceavarias].fimavaria.ano ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.ano && port[indice].avarias[port[indice].indiceavarias].fimavaria.mes ==  port[indice].avarias[port[indice].indiceavarias].dataavaria.mes && port[indice].avarias[port[indice].indiceavarias].fimavaria.dia <  port[indice].avarias[port[indice].indiceavarias].dataavaria.dia));
-        port[indice].avarias[port[indice].indiceavarias].duracaoavaria = subtrairDatas(port[indice].avarias[port[indice].indiceavarias].dataavaria, port[indice].avarias[port[indice].indiceavarias].fimavaria);
+        }while(ava[indice].fimavaria.ano <  ava[indice].dataavaria.ano || (ava[indice].fimavaria.ano ==  ava[indice].dataavaria.ano && ava[indice].fimavaria.mes <  ava[indice].dataavaria.mes)||(ava[indice].fimavaria.ano ==  ava[indice].dataavaria.ano && ava[indice].fimavaria.mes ==  ava[indice].dataavaria.mes && ava[indice].fimavaria.dia <  ava[indice].dataavaria.dia));
+        ava[indice].duracaoavaria = subtrairDatas(ava[indice].dataavaria, ava[indice].fimavaria);
+        strcpy(ava[indice].statavaria, STAT_CONC);      //avaria reparada
     }
 
 }
 
+//falta so ver o comentario
+void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava){     //confirmar valor de indice
+    int i=0,u=0,indice = -1;
+    AVARIAs *a;
+    a = ava;
 
-void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int indice){
-    int i=0,u=0;
-    printf("\n\tTipo de avaria: ");
-    do{
-        lerString(port[indice].avarias[port[indice].quantAvarias].tipoavaria, NMAXX);
-        for(i = 0; i<strlen(port[indice].avarias[port[indice].quantAvarias].tipoavaria);i++){
-            port[indice].avarias[port[indice].quantAvarias].tipoavaria[i] = tolower(port[indice].avarias[port[indice].quantAvarias].tipoavaria[i]);
-        }
-        if(strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_TEMP)!= 0 && strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_PERM)!= 0){
-            printf("\nErro tipo de avaria invalido (temporaria ou permanente).Insira novamente: ");
-        }
-    }while(strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_TEMP)!= 0 && strcmp(port[indice].avarias[port[indice].quantAvarias].tipoavaria, STAT_PERM)!= 0);
-    
-    printf("\n\tData de avaria: ");
-    do{
-        port[indice].avarias[port[indice].quantAvarias].dataavaria = lerData();
-        if(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano < port[indice].aquis.ano ||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes < port[indice].aquis.mes)||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes == port[indice].aquis.mes && port[indice].avarias[port[indice].quantAvarias].dataavaria.dia < port[indice].aquis.dia)){
-            printf("\n\tErro, dia de avaria nao pode ser inferior ao dia de aquisicao.\n\t\tData:");
-        }
-    }while(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano < port[indice].aquis.ano ||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes < port[indice].aquis.mes)||(port[indice].avarias[port[indice].quantAvarias].dataavaria.ano == port[indice].aquis.ano && port[indice].avarias[port[indice].quantAvarias].dataavaria.mes == port[indice].aquis.mes && port[indice].avarias[port[indice].quantAvarias].dataavaria.dia < port[indice].aquis.dia));
-    port[indice].quantAvarias++;
-    port[indice].indiceavarias++;
+    ava = realloc(ava , (cont->totaldeavarias+1)*sizeof(AVARIAs));
+    if(ava == NULL){
+        printf("\nMemoria indisponivel.\n ");
+        ava = a;
+    }
+    else{
+        indice = cont->totaldeavarias;
+        ava[indice].indiceport = ind;
+        ava[indice].portid = port[ava[indice].indiceport].portId;
 
+        printf("\n\tTipo de avaria: ");
+        do{
+            lerString(ava[indice].tipoavaria, NMAXX);
+            for(i = 0; i < strlen(ava[indice].tipoavaria); i++){
+                ava[indice].tipoavaria[i] = tolower(ava[indice].tipoavaria[i]);
+            }
+            if(strcmp(ava[indice].tipoavaria, STAT_TEMP)!= 0 && strcmp(ava[indice].tipoavaria, STAT_PERM)!= 0){
+                printf("\nErro tipo de avaria invalido (temporaria ou permanente).Insira novamente: ");
+            }
+        }while(strcmp(ava[indice].tipoavaria, STAT_TEMP)!= 0 && strcmp(ava[indice].tipoavaria, STAT_PERM)!= 0);
+
+        printf("\n\tData de avaria: ");
+        do{
+            ava[indice].dataavaria = lerData();
+            if(ava[indice].dataavaria.ano < port[ava[indice].indiceport].aquis.ano ||(ava[indice].dataavaria.ano == port[ava[indice].indiceport].aquis.ano && ava[indice].dataavaria.mes < port[ava[indice].indiceport].aquis.mes)||ava[indice].dataavaria.ano == port[ava[indice].indiceport].aquis.ano && ava[indice].dataavaria.mes == port[ava[indice].indiceport].aquis.mes && ava[indice].dataavaria.dia < port[ava[indice].indiceport].aquis.dia){
+                printf("\n\tErro, dia de avaria nao pode ser inferior ao dia de aquisicao.\n\t\tData:");
+            }
+        }while((ava[indice].dataavaria.ano < port[ava[indice].indiceport].aquis.ano ||(ava[indice].dataavaria.ano == port[ava[indice].indiceport].aquis.ano && ava[indice].dataavaria.mes < port[ava[indice].indiceport].aquis.mes)||ava[indice].dataavaria.ano == port[ava[indice].indiceport].aquis.ano && ava[indice].dataavaria.mes == port[ava[indice].indiceport].aquis.mes && ava[indice].dataavaria.dia < port[ava[indice].indiceport].aquis.dia));
+        strcpy(ava[indice].statavaria, STAT_ATIV);      //avaria nao esta reparada
+        port[indice].quantAvarias++;
+        (cont->totaldeavarias)++;
+    }
 }
-
-void regRq(CONTADOREs *cont, PORTATIl port[MAXX]){
+//PROBLEMATICA, nao mostra mensagem de erro em data de requisicao, loop na data de devolucao
+//grande parte esta dentro do for, deviamos mudar
+void regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
     int i= 0,l=0,h = 0,u = 0,idTemporario = 0, indice=-1, numutente = 0, date = 0;
-    if((*cont).portatedisp >0){
+    REQUi *r;
+    r = req;
+    if(cont->totalderequisefet != 0){
+        if((*cont).portatedisp >0){
             printf("\nInsira o numero de identificacao do portatil: ");
             idTemporario = lerInteiro(UM,MAXIMUS);
-            for (l=0;i<(*cont).portatexist;l++){
+            for (l=0;l<(*cont).portatexist;l++){
                 if(port[l].portId == idTemporario){
                     indice = l;
-                    if(strcmp(port[indice].stat,STAT_DISP)==0){
 
-                        //Codigo de Requisicao
-                        printf("\nCodigo de requisicao: ");
-                        do{
-                            lerString(port[indice].requisition[port[indice].quantReq].requiscode,NMAXX);
-                            for(i = 0; i <(*cont).portatexist;i++){
-                                    if(strcmp(port[indice].requisition[port[indice].quantReq].requiscode,port[i].requisition[port[i].quantReq].requiscode)==0){
-                                        //"Podiamos deixar ai um comentario para depois falar à professora", Gonçalo 21/12/2022
-                                        if(strcmp(port[i].requisition[port[i].quantReq].statreq,STAT_ATIV)==0){
-                                            printf("\nCodigo de requisicao indisponivel.\n");
-                                            u = -1;
-                                            i = cont->portatexist;
-                                        }  
+                    if(strcmp(port[indice].stat,STAT_DISP)==0){
+                        printf("\n\t%d",cont->totalderequisefet+1);
+                        req = realloc(req, (cont->totalderequisefet+1)*sizeof(REQUi));
+                        if(req == NULL){
+                            printf("\nMemoria indisponivel.\n");
+                            req = r;
+                        }
+                        else{
+                            //Codigo de Requisicao
+
+                            printf("\nCodigo de requisicao: ");
+                            do{
+                                lerString(req[(*cont).totalderequisefet].requiscode,NMAXX);
+                                for(i = 0; i <(*cont).totalderequisefet;i++){
+                                    if(strcmp(req[(*cont).totalderequisefet].requiscode,req[i].requiscode)==0){
+                                        printf("\nCodigo de requisicao indisponivel. Insira novamente: \n");
+                                        u = -1;
+                                        i = cont->portatexist;
                                     }
+                                }
+                            }while(u == -1);
+                            //Data Requisição
+                            if(port[indice].quantReq == 0){
+                                printf("\n\tData de Requisicao: ");
+                                do{
+                                    req[cont->totalderequisefet].requis = lerData();
+                                    if((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia)){
+                                        printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
+                                    }
+                                }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia));
                             }
-                        }while(u == -1);
-                        //Data Requisição
-                        printf("\nData de Requisicao: ");
-                        do{
-                            port[indice].requisition[port[indice].quantReq].requis = lerData();
-                            if((port[indice].aquis.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes == port[indice].requisition[port[indice].quantReq].requis.mes && port[indice].aquis.dia > port[indice].requisition[port[indice].quantReq].requis.dia)){
-                                printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
+                            else{
+                                printf("\nData de Requisicao: ");
+                                do{
+                                    req[cont->totalderequisefet].requis = lerData();
+                                    //if(port[indice].quantReq != 0){
+                                    if((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia)){
+                                        printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
+                                    }
+                                //}
+                                //else{
+                                    else{   //para apresentar so uma mensagem de erro
+                                        if((port[indice].ultimadev.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes == req[cont->totalderequisefet].requis.mes && port[indice].ultimadev.dia > req[cont->totalderequisefet].requis.dia)){
+                                            printf("\n\tErro data invalida nao pode ser inferior ao dia da ultima devolucao. Insira Novamente: ");
+                                        }
+                                    }
+                                    //}
+
+                                }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia) || (port[indice].ultimadev.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes == req[cont->totalderequisefet].requis.mes && port[indice].ultimadev.dia > req[cont->totalderequisefet].requis.dia));
                             }
-                        }while((port[indice].aquis.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].aquis.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].aquis.mes == port[indice].requisition[port[indice].quantReq].requis.mes && port[indice].aquis.dia > port[indice].requisition[port[indice].quantReq].requis.dia));
-                        //PRazo e cenas...
-                        printf("\nPrazo de Devolucao: ");
-                        do{
-                            port[indice].requisition[port[indice].quantReq].praz = lerData();
-                            if(!((port[indice].requisition[port[indice].quantReq].praz.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes == port[indice].requisition[port[indice].quantReq].requis.mes&&port[indice].requisition[port[indice].quantReq].praz.dia >= port[indice].requisition[port[indice].quantReq].requis.dia))){
-                                printf("\n\tData invalida.\n");
-                            }
-                            port[indice].requisition[port[indice].quantReq].numpraz = subtrairDatas(port[indice].requisition[port[indice].quantReq].requis,port[indice].requisition[port[indice].quantReq].praz);
-                            if(port[indice].requisition[port[indice].quantReq].numpraz >30 ){
+                            //Prazo...
+                            printf("\nPrazo de Devolucao: ");
+                            do{
+                                date = 0;
+                                req[cont->totalderequisefet].praz = lerData();                                                                                                                                                      //acho q aqui e >=
+                                if(!((req[cont->totalderequisefet].praz.ano > req[cont->totalderequisefet].requis.ano) || (req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes > req[cont->totalderequisefet].requis.mes) || ( req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes == req[cont->totalderequisefet].requis.mes && req[cont->totalderequisefet].praz.dia >= req[cont->totalderequisefet].requis.dia))){
+                                    printf("\n\tData invalida.\n");
+                                }
+                                req[cont->totalderequisefet].numpraz = subtrairDatas(req[cont->totalderequisefet].requis,req[cont->totalderequisefet].praz);
+                                if(req[cont->totalderequisefet].numpraz >30 ){
                                     date = -1;
                                     printf("\nErro. O prazo maximo sao 30 dias.");
+                                }
+                            }while((date == -1)||((req[cont->totalderequisefet].praz.ano < req[cont->totalderequisefet].requis.ano) || (req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes < req[cont->totalderequisefet].requis.mes) || ( req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes == req[cont->totalderequisefet].requis.mes&&req[cont->totalderequisefet].praz.dia < req[cont->totalderequisefet].requis.dia)));
+                            //Prazo de devolução tem de ser superior ao dia de requisição
+
+
+                            //Nome Utente
+                            printf("\nNome do utente: ");
+                            lerString(req[cont->totalderequisefet].nomedoutente, MAX_NOME);
+
+                            //Typo Utente
+                            printf("\nTipo de utente: ");
+                            do{
+                                lerString(req[cont->totalderequisefet].typeut, 25);
+                                for(h = 0; h < strlen(req[cont->totalderequisefet].typeut);h++){
+                                    req[cont->totalderequisefet].typeut[h] = tolower(req[cont->totalderequisefet].typeut[h]);
+                                }
+                                if( strcmp(req[cont->totalderequisefet].typeut, TIPO_ESTUD)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_DOCE)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_ADM)!= 0){
+                                    printf("\nErro tipo de utente invalido (estudante, docente, tecnico administrativo).Insira novamente: ");
+                                }
+                            }while(strcmp(req[cont->totalderequisefet].typeut, TIPO_ESTUD)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_DOCE)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_ADM)!= 0);
+
+                            // Numero de utente
+                            printf("\nNumero do utente: ");
+                            do{
+                                numutente = lerUtente(cont, port,req);
+                            }while(numutente == -1);
+                            if(numutente == -2){
+                                printf("\n\t\t\t\tRegisto cancelado!\n");
                             }
-                        }while( (date == -1)||(!((port[indice].requisition[port[indice].quantReq].praz.ano > port[indice].requisition[port[indice].quantReq].requis.ano) || (port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes > port[indice].requisition[port[indice].quantReq].requis.mes) || ( port[indice].requisition[port[indice].quantReq].praz.ano == port[indice].requisition[port[indice].quantReq].requis.ano && port[indice].requisition[port[indice].quantReq].praz.mes == port[indice].requisition[port[indice].quantReq].requis.mes&&port[indice].requisition[port[indice].quantReq].praz.dia >= port[indice].requisition[port[indice].quantReq].requis.dia))));
-                        //Prazo de devolução tem de ser superior ao dia de requisição
-                        
-                        
-                        //Nome Utente
-                        printf("\nNome do utente: ");
-                        lerString(port[indice].requisition[port[indice].quantReq].nomedoutente, MAX_NOME);
-                        
-                        //Typo Utente
-                        printf("\nTipo de utente: ");
-                        do{
-                            lerString(port[indice].requisition[port[indice].quantReq].typeut, 25);
-                            for(h = 0; h < strlen(port[indice].requisition[port[indice].quantReq].typeut);h++){
-                                port[indice].requisition[port[indice].quantReq].typeut[h] = tolower(port[indice].requisition[port[indice].quantReq].typeut[h]);
+                            else{
+                                req[cont->totalderequisefet].numutent = numutente;
+                                (port[indice].quantReq)++;
+                                strcpy(req[cont->totalderequisefet].statreq, STAT_ATIV);
+                                req[cont->totalderequisefet].portid = port[indice].portId;
+                                req[cont->totalderequisefet].indiceport = indice;
+                                ((*cont).requisativas)++;
+                                (cont->totalderequisefet)++;
+                                (cont->portatedisp)--;
+                                strcpy(port[indice].stat, STAT_REQ);
+
                             }
-                            if(strcmp(port[indice].requisition[port[indice].quantReq].typeut, TIPO_ESTUD)!= 0 && strcmp(port[indice].requisition[port[indice].quantReq].typeut, TIPO_DOCE)!= 0 && strcmp(port[indice].requisition[port[indice].quantReq].typeut, TIPO_ADM)!= 0){
-                                printf("\nErro tipo de utente invalido (estudante, docente, tecnico administrativo).Insira novamente: ");
-                            }
-                        }while(strcmp(port[indice].requisition[port[indice].quantReq].typeut, TIPO_ESTUD)!= 0 && strcmp(port[indice].requisition[port[indice].quantReq].typeut, TIPO_DOCE)!= 0 && strcmp(port[indice].requisition[port[indice].quantReq].typeut, TIPO_ADM)!= 0);
-                        
-                        // Numero de utente
-                        printf("\nNumero do utente: ");
-                        do{
-                            numutente = lerUtente(cont, port);
-                        }while(numutente == -1);
-                        if(numutente == -2){
-                            printf("\n\t\t\t\tRegisto cancelado!\n");
-                        }
-                        else{       
-                            port[indice].requisition[port[indice].quantReq].numutent = numutente;
-                            (port[indice].quantReq)++;
-                            (port[indice].indicereq)++;
-                            ((*cont).requisativas)++;
-                            (cont->totalderequisefet)++;
-                            (cont->portatedisp)--;
-                            strcpy(port[indice].requisition[port[indice].indicereq].statreq, STAT_ATIV);
-                            strcpy(port[indice].stat, STAT_REQ);
                         }
                     }
                     else{
                         printf("\nPortatil indisponivel\n");
                     }
-                    i = (*cont).portatexist;
+                    l = (*cont).portatexist;
+                    //fim do ciclo
                 }
 
             }
@@ -635,36 +751,148 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX]){
                 printf("\nId nao existe\n");
             }
 
+        }
+        else{
+            printf("\nNao ha computadores disponiveis!\n");
+        }
+
     }
     else{
-        printf("\nNao ha computadores disponiveis!\n");
+        if((*cont).portatedisp >0){
+            printf("\nInsira o numero de identificacao do portatil: ");
+            idTemporario = lerInteiro(UM,MAXIMUS);
+            for (l=0;l<(*cont).portatexist;l++){
+                if(port[l].portId == idTemporario){
+                    indice = l;
+
+                    if(strcmp(port[indice].stat,STAT_DISP)==0){
+
+                        req = realloc(req,((*cont).totalderequisefet+1)*sizeof(REQUi));
+                        //adiciona espaço
+                        //Codigo de Requisicao
+
+                        printf("\nCodigo de requisicao: ");
+                        do{
+                            lerString(req[(*cont).totalderequisefet].requiscode,NMAXX);
+                            for(i = 0; i <(*cont).totalderequisefet;i++){
+                                    if(strcmp(req[(*cont).totalderequisefet].requiscode,req[i].requiscode)==0){
+                                            printf("\nCodigo de requisicao indisponivel.\n");
+                                            u = -1;
+                                            i = cont->portatexist;
+                                    }
+                            }
+                        }while(u == -1);
+                        //Data Requisição
+                        printf("\nData de Requisicao: ");
+                        do{
+                            req[cont->totalderequisefet].requis = lerData();
+                            if(port[indice].quantReq != 0){
+                                if((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia)){
+                                    printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
+                                }
+                            }
+                        }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia));
+                        //PRazo e cenas...
+                        printf("\nPrazo de Devolucao: ");
+                        do{
+                            req[cont->totalderequisefet].praz = lerData();
+                            if(!((req[cont->totalderequisefet].praz.ano > req[cont->totalderequisefet].requis.ano) || (req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes > req[cont->totalderequisefet].requis.mes) || ( req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes == req[cont->totalderequisefet].requis.mes&&req[cont->totalderequisefet].praz.dia >= req[cont->totalderequisefet].requis.dia))){
+                                printf("\n\tData invalida.\n");
+                            }
+                            req[cont->totalderequisefet].numpraz = subtrairDatas(req[cont->totalderequisefet].requis,req[cont->totalderequisefet].praz);
+                            if(req[cont->totalderequisefet].numpraz >30 ){
+                                    date = -1;
+                                    printf("\nErro. O prazo maximo sao 30 dias.");
+                            }
+                        }while( (date == -1)||(!((req[cont->totalderequisefet].praz.ano > req[cont->totalderequisefet].requis.ano) || (req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes > req[cont->totalderequisefet].requis.mes) || ( req[cont->totalderequisefet].praz.ano == req[cont->totalderequisefet].requis.ano && req[cont->totalderequisefet].praz.mes == req[cont->totalderequisefet].requis.mes&&req[cont->totalderequisefet].praz.dia >= req[cont->totalderequisefet].requis.dia))));
+                        //Prazo de devolução tem de ser superior ao dia de requisição
+
+
+                        //Nome Utente
+                        printf("\nNome do utente: ");
+                        lerString(req[cont->totalderequisefet].nomedoutente, MAX_NOME);
+
+                        //Typo Utente
+                        printf("\nTipo de utente: ");
+                        do{
+                            lerString(req[cont->totalderequisefet].typeut, 25);
+                            for(h = 0; h < strlen(req[cont->totalderequisefet].typeut);h++){
+                                req[cont->totalderequisefet].typeut[h] = tolower(req[cont->totalderequisefet].typeut[h]);
+                            }
+                            if( strcmp(req[cont->totalderequisefet].typeut, TIPO_ESTUD)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_DOCE)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_ADM)!= 0){
+                                printf("\nErro tipo de utente invalido (estudante, docente, tecnico administrativo).Insira novamente: ");
+                            }
+                        }while(strcmp(req[cont->totalderequisefet].typeut, TIPO_ESTUD)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_DOCE)!= 0 && strcmp(req[cont->totalderequisefet].typeut, TIPO_ADM)!= 0);
+
+                        // Numero de utente
+                        printf("\nNumero do utente: ");
+                        do{
+                            numutente = lerUtente(cont, port,req);
+                        }while(numutente == -1);
+                        if(numutente == -2){
+                            printf("\n\t\t\t\tRegisto cancelado!\n");
+                        }
+                        else{
+                            req[cont->totalderequisefet].numutent = numutente;
+                            (port[indice].quantReq)++;
+                            strcpy(req[cont->totalderequisefet].statreq, STAT_ATIV);
+                            req[cont->totalderequisefet].portid = port[indice].portId;
+                            req[cont->totalderequisefet].indiceport = indice;
+                            ((*cont).requisativas)++;
+                            (cont->totalderequisefet)++;
+                            (cont->portatedisp)--;
+                            strcpy(port[indice].stat, STAT_REQ);
+
+                        }
+                    }
+                    else{
+                        printf("\nPortatil indisponivel\n");
+                    }
+                    l = (*cont).portatexist;
+                    //fim do ciclo
+                }
+
+            }
+            if(indice == -1){
+                printf("\nId nao existe\n");
+            }
+
+        }
+        else{
+            printf("\nNao ha computadores disponiveis!\n");
+        }
+
     }
 }
-void listaReq(CONTADOREs *cont, PORTATIl port[MAXX]){
+//arrebenta, !!
+void listaReq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
     int i=0,u=0,o=0;
-    for(i=0; i<cont->portatexist;i++){
-        if(port[i].quantReq != 0){
-            printf("\nComputador: %s",port[i].desig);
-            for(u=0; u< port[i].quantReq;u++){      // requi e um vetor, logo temos de fazer outro for
-                printf("\n\tData requisicao: %d/%d/%d",port[i].requisition[u].requis.dia,port[i].requisition[u].requis.mes,port[i].requisition[u].requis.ano);
-                printf("\n\tEstado da requisicao: %s",port[i].requisition[u].statreq);
-                if(strcmp(port[i].requisition[u].statreq, STAT_ATIV)==0){
-                    printf("\n\tDia maximo de Devolucao: %d/%d/%d",port[i].requisition[u].praz.dia,port[i].requisition[u].praz.mes,port[i].requisition[u].praz.ano);
-                    printf("\n\tDuracao maxima da requisicao: %d",port[i].requisition[u].numpraz);
+    if(cont->totalderequisefet != 0){
+        for(i=0; i < cont->totalderequisefet;i++){
+            printf("\nComputador: %s",port[req[i].indiceport].desig);
+                  // requi e um vetor, logo temos de fazer outro for
+                printf("\n\tData requisicao: %d/%d/%d",req[i].requis.dia,req[i].requis.mes,req[i].requis.ano);
+                printf("\n\tEstado da requisicao: %s",req[i].statreq);
+                if(strcmp(req[i].statreq, STAT_ATIV)==0){
+                    printf("\n\tDia maximo de Devolucao: %d/%d/%d",req[i].praz.dia,req[i].praz.mes,req[i].praz.ano);
+                    printf("\n\tDuracao maxima da requisicao: %d",req[i].numpraz);
                     printf("\n\tLocal: ---\n\tMulta: ---\n");
                 }
                 else{
-                    printf("\n\tDevolucao: %d/%d/%d",port[i].requisition[u].devol.dia,port[i].requisition[u].devol.mes,port[i].requisition[u].devol.ano);
-                    printf("\n\tDuracao da  requisicao: %d",port[i].requisition[u].prazreal);
-                    printf("\n\tLocal: %s\n\tMulta: %d\n",port[i].requisition[u].local,port[i].requisition[u].finee);
+                    printf("\n\tDevolucao: %d/%d/%d",req[i].devol.dia,req[i].devol.mes,req[i].devol.ano);
+                    printf("\n\tDuracao da  requisicao: %d",req[i].prazreal);
+                    printf("\n\tLocal: %s\n\tMulta: %d\n",req[i].local,req[i].finee);
                 }
-            }
+
         }
+    }
+    else{
+        printf("\nErro! Nao existem requisicoes.\n");
     }
 }
 
-
-void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
+//Tá bom! ! !
+void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava){
     int i,u,desig=0, aux = 0,prob = -1, tempid = -1;
     printf("\nQuantos pcs deseja inserir: ");
     u = lerInteiro(0,MAXX);
@@ -676,9 +904,10 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
     else{
         for(i = (*cont).portatexist; i<u; i++){
             port[i].quantAvarias = 0;
-            port[i].indiceavarias = -1;
+            port[i].quantDev = 0;
+            port[i].quantDiasReq=0;
             printf("\n\n\tId: ");
-            do{    
+            do{
                 tempid = lerInteiro(UM,MAXIMUS);
                 prob = lerID(cont,port,tempid);
                 if(prob != -1){
@@ -686,8 +915,8 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
                 }
             }while(prob != -1);
             port[i].portId = tempid;
-            
-            do{   
+
+            do{
                 printf("\nDesignacao do portatil: ");
                 desig = lerDesignacao(cont,port,i);
             }while(desig == -1);
@@ -699,8 +928,11 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
                     printf("O processador inserido nao e valido. Insira novamente (i3, i5 ou i7): ");
                 }
             }while(strcmp(I3, port[i].process) != 0 && strcmp(I5, port[i].process) != 0 && strcmp(I7, port[i].process) != 0);
-            
-            
+
+
+            printf("\n\tQuantidade de memoria: ");
+
+            port[i].memoria = lerInteiro(UM,MAXIMUS);
 
             printf("\n\tLocalizacao: ");
             do{
@@ -712,11 +944,13 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
                     printf("\nLocalizacao invalida (Campus1, Campus2, Campus5 ou Residencias). Insira novamente: ");
                 }
             }while(strcmp(CAMPUS1 , port[i].local)!=0 && strcmp(CAMPUS2, port[i].local)!=0 && strcmp(CAMPUS5, port[i].local)!=0 && strcmp(RESID, port[i].local)!=0);
-            
+
             printf("\n\tData de aquisicao: ");
             port[i].aquis = lerData();
-            
-            printf("\n\tEstado: ");
+
+            //estado
+            strcpy(port[i].stat,STAT_DISP);
+            /*
             do{
                 lerString(port[i].stat,NMAXX);
                 for(aux = 0; aux < strlen(port[i].stat); aux++){
@@ -724,18 +958,19 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
                 }
                 if(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0){
                     printf("\nEstado invalido (avariado, requisitado, disponivel). Insira novamente: ");
-                    
+
                 }
             }while(strcmp(STAT_DISP, port[i].stat)!=0 && strcmp(STAT_REQ, port[i].stat)!=0 && strcmp(STAT_AVA, port[i].stat)!=0);
             if(strcmp(STAT_AVA, port[i].stat)==0){
-                regAva(cont, port, i);
+
+                regAva(cont, port,i,ava);  // adicionar indice
             }
-            
+            */
+
             printf("\n\tValor do equipamento: ");
             port[i].valuequi = lerFloat(MAXX,MAXIMUS);
-            
+
             port[i].quantReq = 0;
-            port[i].indicereq = -1;
             (*cont).portatexist = i + 1 ;
 
         }
@@ -747,13 +982,22 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX]){
             }
         }
     }
-    
-}
 
-void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so e acionada se houverem pcs
-    int opcao, quant = 0, i,u=0,aux1,aux2,aux3,aux4;
+}
+// por alterar
+void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req){      //funcao so e acionada se houverem pcs
+    int opcao, quant = 0, i,aux1,aux3;
+    int numerodeMultas=0, auxdata=0,referencia = -1,*indicereqderef,*confindice,numdemin=0,u=-1;
+    int quantEst = 0, quantDoce = 0, quantTec = 0;
+    float atalmedia,totalMultas=0,percentagem;
     char processador[3];
-    float percentagem;
+    DATa base;
+    base.dia = 1;
+    base.mes = 1;
+    base.ano = 2010;
+    indicereqderef=NULL;
+    confindice = indicereqderef;
+
     printf("\n\t1 - %% de portateis com um processador\n\t2 - Custo medio de cada multa\n\t3 - Tipo(s) de utente(s) com a menor quantidade de requisicoes efetuadas\n\t4 - Devolucao(coes) mais recente(s)\n\t0 - Sair\n");
     printf("\t\tOpcao -> ");
     opcao = lerInteiro(0, 4);
@@ -776,37 +1020,38 @@ void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so 
         printf("A percentagem de processadores %s e %.1f%%.\n", processador, percentagem);
         break;
     case 2:
-        int numerodeMultas=0;
-        float atalmedia,totalMultas=0;
-        for(aux1 = 0; aux1 < (*cont).portatexist; aux1++){
-            for(aux2 = 0;aux2 < port[aux1].quantReq;aux2++){
-                if(port[aux1].requisition[aux2].finee > 0){
-                    totalMultas += port[aux1].requisition[aux2].finee;
-                    numerodeMultas++;
-                }
+        for(aux1 = 0; aux1 < (*cont).totalderequisefet; aux1++){
+            if(req[aux1].finee > 0){
+                totalMultas += req[aux1].finee;
+                numerodeMultas++;
             }
         }
-        atalmedia = (float)totalMultas/numerodeMultas;
+        if(numerodeMultas!=0){
+            atalmedia = (float)totalMultas/numerodeMultas;
+        }
+        else{
+            atalmedia = 0;
+        }
         printf("\n\tO custo media de cada multa e %f.",atalmedia);
         break;
-    case 3:                                     // ainda nao terminado!!!! /////
+    case 3:
         if( (cont->totalderequisefet) == 0){
             printf("\nAinda nao foram realizadas requisicoes.\n");
         }
         else{
-            int quantEst = 0, quantDoce = 0, quantTec = 0;
-            for(i=0; i < (cont->portatexist); i++){
-                for(u = 0; u < port[i].quantReq; u++){        
-                    if(strcmp(TIPO_ESTUD, port[i].requisition[u].typeut) == 0){       
+
+            for(i=0; i < (cont->totalderequisefet); i++){
+
+                    if(strcmp(TIPO_ESTUD, req[i].typeut) == 0){
                         quantEst ++;
                     }
-                    if(strcmp(TIPO_DOCE, port[i].requisition[u].typeut) == 0){       
+                    if(strcmp(TIPO_DOCE, req[i].typeut) == 0){
                         quantDoce ++;
                     }
-                    if(strcmp(TIPO_ADM, port[i].requisition[u].typeut) == 0){       
+                    if(strcmp(TIPO_ADM, req[i].typeut) == 0){
                         quantTec ++;
                     }
-                }
+
             }
             if(quantEst < quantDoce){
                 if(quantEst < quantTec){
@@ -831,7 +1076,7 @@ void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so 
                             printf("\n\tOs utentes estudante, docente e tecnico administrativo tem a mesma quantidade de requisicoes : %d requisicao(coes).",quantTec);
                         }
                         else{
-                            printf("\n\tO tipo de utente em minoria e o tecnico administrativo: %d requisicao(coes).",quantTec); 
+                            printf("\n\tO tipo de utente em minoria e o tecnico administrativo: %d requisicao(coes).",quantTec);
                         }
                     }
                 }
@@ -849,39 +1094,68 @@ void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX]){      //funcao so 
                     }
                 }
             }
-        }    
+        }
         break;
     case 4:
-        for(aux3 = 0; aux1 < (*cont).portatexist; aux1++){
-            for(aux4 = 0;aux2 < port[aux1].quantReq;aux2++){
-            
+        if(cont->totalderequisefet!=0){      //ids possui ids de pcs já  registados e devolvidos
+            for(aux3 = 0;aux3<cont->totalderequisefet;aux3++){
+                if(strcmp(req[aux3].statreq,STAT_CONC)){
+                    auxdata = subtrairDatas(base,req[aux3].devol);
+                    if(auxdata > referencia){
+                        referencia = auxdata;
+                    }
+                }
             }
+            for(aux3 = 0;aux3<cont->totalderequisefet;aux3++){
+                if(strcmp(req[aux3].statreq,STAT_CONC)){
+                    auxdata = subtrairDatas(base,req[aux3].devol);
+                    if(auxdata == referencia){
+                        numdemin ++;
+                        u++;
+                        indicereqderef = realloc(indicereqderef,(numdemin)*sizeof(int));
+                        if(indicereqderef == NULL){
+                            printf("\nErro de memoria!\n");
+                        }
+                        else{
+                            indicereqderef[u]=aux3;
+                        }
+
+                    }
+                }
+            }
+            printf("\nA(s) ultima(s) requisicao(coes) é(sao):");
+            for(aux3 = u; aux3 >=0;aux3--){
+                printf("\nId:%d\n\t\tDia de devolucao: %d - %d - %d",req[indicereqderef[aux3]].portid,req[indicereqderef[aux3]].devol.dia,req[indicereqderef[aux3]].devol.mes,req[indicereqderef[aux3]].devol.ano);
+            }
+        }
+        else{
+            printf("\n\tNao existem requisicoes registadas.\n");
         }
         break;
     default:
         printf("\n\n\n\n");
     }
+
 }
 
 //________________________________________________________________________________________________________________________________________________________________
-void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX]){
-    FILE *fc,*fp;
+void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava){
+    FILE *fc,*fp,*fa;
     //ficheiro contadores, ficheiro portateis
     int confirmacao = 1;
     char continuar;
-
     if(cont.portatexist == 0){
-        printf("\nNão há registo(gravar nada), pretende continuar?(Y/N) ");
+        printf("\nNão há registo(gravar nada), pretende continuar?(S/N) ");
         do{
             continuar = getchar();
             continuar = toupper(continuar);
-        }while(continuar != 'Y' && continuar != 'N');
+        }while(continuar != 'S' && continuar != 'N');
         switch (continuar){
 
-        case 'Y':
+        case 'S':
             confirmacao = 1 ;
             break;
-        
+
         case 'N':
             confirmacao = 0 ;
             break;
@@ -898,7 +1172,6 @@ void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX]){
         }
         else{
             fwrite(&cont,sizeof(CONTADOREs),1,fc);
-            
         }
         fclose(fc);
 
@@ -907,24 +1180,36 @@ void gravarFicheiroBinario(CONTADOREs cont, PORTATIl port[MAXX]){
             printf("\nErro ao abrir o ficheiro!\n");
         }
         else{
-            fwrite(port,sizeof(PORTATIl),MAXX,fp);
-            
+            fwrite(port,sizeof(PORTATIl),cont.portatexist,fp);
+            fwrite(req,sizeof(REQUi),cont.totalderequisefet,fp);
         }
         fclose(fp);
+
+        fa = fopen("avarias.dat","wb");
+        if(fa == NULL){
+            printf("\n\nErro ao abrir o ficheiro!\n");
+        }
+        else{
+            fwrite(ava,sizeof(AVARIAs),cont.totaldeavarias,fa);
+        }
+        fclose(fa);
     }
 }
 
-void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]){
-    FILE *fc,*fp;
-    //char problem = 'K';
+void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req, AVARIAs *ava){
+    FILE *fc,*fp,*fa;
+    REQUi *talvezcorramal; // talvez corra mal, então guarda-se o valor para ser reposto
+    talvezcorramal = req;
+    AVARIAs *talvezcorramalsim; // talvez corra mal, se sim entao guardamos o valor na variavel para colocar de novo na ava
+    talvezcorramalsim = ava;
+    char problem = 'K';
     fc = fopen("contadores.dat", "rb");
     if (fc==NULL){
         printf("\nErro ao abrir o ficheiro!\n");
-        //problem = 'O';
+        problem = 'O';
     }
     else{
         fread(&(*cont),sizeof(CONTADOREs),1,fc);
-        
     }
     fclose(fc);
 
@@ -933,19 +1218,44 @@ void lerFicheiroBinario(CONTADOREs *cont, PORTATIl port[MAXX]){
         printf("\nErro ao abrir o ficheiro!\n");
     }
     else{
-        /*
         if(problem == 'O'){
-            fread(port,sizeof(PORTATIl),30,fp);
+            printf("\n\tNao e possivel retirar do ficheiro a informacao.\n");
         }
         else{
-            fread(port,sizeof(PORTATIl),30,fp);
-            
+            req = realloc(req,(cont->totalderequisefet)*sizeof(REQUi));
+            if(req == NULL){
+                printf("\n\tErro de memoria!\n");
+                req = talvezcorramal;
+                problem = 'N';
+            }
+            ava = realloc(ava,(cont->totaldeavarias)*sizeof(AVARIAs));
+            if(ava == NULL){
+                printf("\n\tErro de memoria!\n");
+                ava = talvezcorramalsim;
+                problem = 'N';
+            }
+            if(problem == 'N'){
+                printf("\n\tNao e possivel erro memoria.\n");
+            }
+            else{
+                fread(port,sizeof(PORTATIl),cont->portatexist,fp);
+                fread(req,sizeof(REQUi),cont->totalderequisefet,fp);
+
+            }
         }
-        */
-       fread(port,sizeof(PORTATIl),30,fp);
-        
+
     }
     fclose(fp);
+    if(problem != 'O'&& problem != 'N'){
+        fa = fopen("avarias.dat","wb");
+        if(fa == NULL){
+            printf("\n\nErro ao abrir o ficheiro!\n");
+        }
+        else{
+            fread(ava,sizeof(AVARIAs),cont->totaldeavarias,fa);
+        }
+        fclose(fa);
+    }
 }
 
 /*_________________________________________________________________________________________________*/
@@ -972,23 +1282,22 @@ int lerID(CONTADOREs *cont, PORTATIl port[MAXX], int idtemp){
     return id;
 }
 
-int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]){
+int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
     int i, ut=0,u=0;
     char conf, confdoconf;
     ut = lerInteiro(UM,MAXIMUS);
-    for (i=0; i<(*cont).portatexist; i++){
-        for(u=0; u<port[i].quantReq; u++){
-            if( ut == port[i].requisition[u].numutent && strcmp(port[i].requisition[u].statreq,STAT_ATIV)==0){
-                printf("\nO utente com o numero %d, ja tem uma requisicao ativa!",port[i].requisition[u].numutent);
-                u = port[i].quantReq;
-                i = (*cont).portatexist;
+    for (i=0; i<(*cont).totalderequisefet; i++){
+            if( ut == req[i].numutent && strcmp(req[i].statreq,STAT_ATIV)==0){
+                printf("\nO utente com o numero %d, ja tem uma requisicao ativa!",req[i].numutent);
+
+                i = (*cont).totalderequisefet;
                 printf("\n\tDeseja continuar com o registo com este numero?(S/N)");
                 do{
                     conf = getchar();
                     conf = toupper(conf);
                 }while(conf != 'S'&& conf != 'N');
             }
-        }
+
     }
     if(conf == 'N'){
         ut = -2;
@@ -1006,23 +1315,20 @@ int lerUtente(CONTADOREs *cont, PORTATIl port[MAXX]){
     }
     return ut;
 }
-
-int procurarReq(CONTADOREs *cont, PORTATIl port[MAXX], int *sitio){
-    int i, cod = -1, u;
+//explodiu quando meti um codigo invalido...
+int procurarReq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
+    int i, cod = -1;
     char code[NMAXX];
     lerString(code, NMAXX);
-    for (i=0; i < (*cont).portatexist; i++){
-        for(u = 0; u < port[i].quantReq; u++) {
-            if (strcmp(port[i].requisition[u].requiscode, code)==0){  
-                cod = i;
-                *sitio = u;
-
-                i = (*cont).portatexist;
-                u = port[i].quantReq;
-            }
+    for (i=0; i < (*cont).totalderequisefet; i++){
+        if(strcmp(req[i].requiscode, code)==0){
+            cod = i;
+            printf("\nTeste %d\n", &i);
+            i = (*cont).totalderequisefet;
         }
     }
-    return cod;
+
+    return cod; //devolve indice da requesicao
 }
 
 int lerDesignacao(CONTADOREs *cont, PORTATIl port[MAXX], int pos){
@@ -1030,7 +1336,7 @@ int lerDesignacao(CONTADOREs *cont, PORTATIl port[MAXX], int pos){
     char design[MAX_DESIG];
     lerString(design, MAX_DESIG);
     for (i=0; i < (*cont).portatexist; i++){
-        if (strcmp(port[i].desig, design)==0){  
+        if (strcmp(port[i].desig, design)==0){
             des = -1;
             i = (*cont).portatexist;
             printf("\nErro, designacao existente.\n");
@@ -1043,7 +1349,7 @@ int lerDesignacao(CONTADOREs *cont, PORTATIl port[MAXX], int pos){
 }
 int subtrairDatas(DATa d1, DATa d2){
     int numerodedias=0,numerodedias1=0,numerodedias2 =0, numerodemeses =0, numerodeanos = 0, diffdias = 0;
-    
+
     if((d2.ano > d1.ano )|| (d2.ano==d1.ano && d2.mes > d1.mes )|| (d2.ano==d1.ano && d2.mes==d1.mes && d2.dia >d1.dia)){
         if(d2.ano==d1.ano && d2.mes==d1.mes && d2.dia >d1.dia){
             numerodedias = d2.dia - d1.dia;
@@ -1063,7 +1369,7 @@ int subtrairDatas(DATa d1, DATa d2){
                     case 2:
                         if((d2.ano%400==0) || (d2.ano%4==0 && d2.ano%100!=0)){
                             numerodedias+= 29;
-                        }       
+                        }
                         else{
                             numerodedias+= 28;
                         }
@@ -1098,7 +1404,7 @@ int subtrairDatas(DATa d1, DATa d2){
                         case 2:
                             if((d2.ano%400==0) || (d2.ano%4==0 && d2.ano%100!=0)){
                                 numerodedias+= 29;
-                            }       
+                            }
                             else{
                                 numerodedias+= 28;
                             }
@@ -1124,7 +1430,7 @@ int subtrairDatas(DATa d1, DATa d2){
                         case 2:
                             if((d1.ano%400==0) || (d1.ano%4==0 && d1.ano%100!=0)){
                                 numerodedias1+= 29;
-                            }       
+                            }
                             else{
                                 numerodedias1+= 28;
                             }
@@ -1148,7 +1454,7 @@ int subtrairDatas(DATa d1, DATa d2){
                         case 2:
                             if((d2.ano%400==0) || (d2.ano%4==0 && d2.ano%100!=0)){
                                 numerodedias2+= 29;
-                            }       
+                            }
                             else{
                                 numerodedias2+= 28;
                             }
@@ -1162,12 +1468,98 @@ int subtrairDatas(DATa d1, DATa d2){
             }
 
         }
- 
+
     }
     else{
         numerodedias = -1;
     }
     return numerodedias;
+}
+
+DATa sumD(DATa d1, int d){
+    int aux,aux1,aux2,aux3;
+    DATa data;
+    switch(d1.mes){
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+            aux = d1.dia+7;
+            aux1 = aux -31;
+            if(aux1>0){
+                data.mes = d1.mes +1;
+                data.dia = aux1;
+                data.ano = d1.ano;
+            }
+            else{
+                data.mes = d1.mes;
+                data.dia = aux,
+                data.ano = d1.ano;
+            }
+            break;
+        case 12:
+            aux = d1.dia+7;
+            aux1 = aux -31;
+            if(aux1 > 0){
+                data.mes = 1;
+                data.dia = aux1;
+                data.ano = d1.ano++;
+            }
+            else{
+                data.dia = aux;
+                data.mes = d1.mes;
+                data.ano = d1.ano;
+            }
+            break;
+        case 2:
+            if((d1.ano%400==0) || (d1.ano%4==0 && d1.ano%100!=0)){
+                aux =d1.dia+7 ;
+                aux1 = aux -29;
+                if(aux1 >0){
+                    data.mes = d1.mes++;
+                    data.dia = aux1;
+                    data.ano =d1.ano;
+                }
+                else{
+                    data.mes = d1.mes;
+                    data.dia = aux;
+                    data.ano = d1.ano;
+                }
+            }
+            else{
+                aux = d1.dia + 7;
+                aux1 = aux -28;
+                if(aux1 > 0){
+                    data.mes = d1.mes++;
+                    data.dia = aux1;
+                    data.ano = d1.ano;
+                }
+                else{
+                    data.mes = d1.mes;
+                    data.dia = aux;
+                    data.ano = d1.ano;
+                }
+            }
+            break;
+
+
+        default:
+            aux = d1.dia+7;
+            aux1 = aux -30;
+            if(aux1>0){
+                data.mes = d1.mes +1;
+                data.dia = aux1;
+                data.ano = d1.ano;
+            }
+            else{
+                data.mes = d1.mes;
+                data.dia = aux,
+                data.ano = d1.ano;
+            }
+    }
+    return data;
 }
 
 DATa lerData(void){
@@ -1206,7 +1598,7 @@ int lerInteiro(int min, int max){
     do
     {
         controlo = scanf("%d", &numero);
-        limpaBufferStdin(); 
+        limpaBufferStdin();
         if (numero<min || numero>max || controlo==0){
             printf("\nValor invalido! Insira novamente: ");
         }
@@ -1250,4 +1642,3 @@ void lerString(char vetor[], int max)
         vetor[tamanhoString-1] ='\0'; /*substitui \n da string armazenada em vetor por \0 */
     }
 }
-
