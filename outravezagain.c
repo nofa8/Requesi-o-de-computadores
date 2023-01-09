@@ -650,6 +650,19 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
                                     }
                                 }while(u == -1);
                                 //Data Requisição
+                                if(port[indice].quantReq == 0){
+                                printf("\n\tData de Requisicao: ");
+                                do{
+                                    req[cont->totalderequisefet].requis = lerData();
+                                    if(port[indice].quantReq != 0){
+                                        if((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia)){
+                                            printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
+                                        }
+                                    }
+                                }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia));
+
+                                }
+                                else{
                                 printf("\nData de Requisicao: ");
                                 do{
                                     req[cont->totalderequisefet].requis = lerData();
@@ -666,6 +679,7 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
 
                                 }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia) || (port[indice].ultimadev.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes == req[cont->totalderequisefet].requis.mes && port[indice].ultimadev.dia > req[cont->totalderequisefet].requis.dia));
                                 //PRazo e cenas...
+                                }
                                 printf("\nPrazo de Devolucao: ");
                                 do{
                                     date = 0;
@@ -772,13 +786,7 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
                                         printf("\n\tErro data invalida nao pode ser inferior ao dia de aquisicao.");
                                     }
                                 }
-                                else{
-                                    if((port[indice].ultimadev.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes == req[cont->totalderequisefet].requis.mes && port[indice].ultimadev.dia > req[cont->totalderequisefet].requis.dia)){
-                                        printf("\n\tErro data invalida nao pode ser inferior ao dia da ultima devolucao. Insira Novamente: ");
-                                    }
-                                }
-
-                            }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia) || (port[indice].ultimadev.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].ultimadev.ano == req[cont->totalderequisefet].requis.ano && port[indice].ultimadev.mes == req[cont->totalderequisefet].requis.mes && port[indice].ultimadev.dia > req[cont->totalderequisefet].requis.dia));
+                            }while((port[indice].aquis.ano > req[cont->totalderequisefet].requis.ano) || (port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes > req[cont->totalderequisefet].requis.mes) || ( port[indice].aquis.ano == req[cont->totalderequisefet].requis.ano && port[indice].aquis.mes == req[cont->totalderequisefet].requis.mes && port[indice].aquis.dia > req[cont->totalderequisefet].requis.dia));
                             //PRazo e cenas...
                             printf("\nPrazo de Devolucao: ");
                             do{
