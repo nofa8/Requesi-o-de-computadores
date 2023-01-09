@@ -6,6 +6,7 @@
 #define MAXIMUS 9999
 #define MAXX 30
 #define NMAXX 15
+#define SETE 7
 #define UM 1
 #define ZERO 0
 
@@ -126,6 +127,7 @@ void lerString(char vetor[], int max);
 float lerFloat(float min, float max);
 DATa lerData(void);
 int subtrairDatas(DATa d1, DATa d2);
+DATa sumD(DATa d1, int d);
 
 char menu(CONTADOREs *cont,PORTATIl port[MAXX]);
 void subListar(CONTADOREs *cont, PORTATIl port1[MAXX], REQUi *req, AVARIAs *ava);
@@ -156,8 +158,8 @@ int main()
     ava = NULL;
     CONTADOREs oscontadores;
     PORTATIl portateis[MAXX];
-    char escolha, outrolocal[NMAXX];
-    int i = 0, pc = 0, confoutro = -1, aux = 0, aux1 = -1;
+    char escolha, outrolocal[NMAXX],rqcode[NMAXX];
+    int i = 0, pc = 0, confoutro = -1, aux = 0, aux1 = -1,aux2=-1;
     oscontadores.portatexist = 0;
     oscontadores.portatedisp = 0;
     oscontadores.requisativas = 0;
@@ -199,7 +201,7 @@ int main()
 
                     }
                     else{
-                        if(strcmp(portateis[conf].stat,STAT_DISP)==0){
+                        if(strcmp(portateis[conf].stat,STAT_DISP)==0){  // conf indica o vetor do port
                             regAva(&oscontadores,portateis,conf,ava);
                             strcpy(portateis[conf].stat,STAT_AVA);
                             oscontadores.portatedisp--;
@@ -208,7 +210,7 @@ int main()
                             regAva(&oscontadores,portateis,conf,ava);
                             strcpy(portateis[conf].stat,STAT_AVA);
                             for( i = oscontadores.totalderequisefet; i >=0;i--){
-                                if(req[i].portid==portateis[conf].portId){
+                                if(req[i].portid == portateis[conf].portId){
                                     if(strcmp(req[i].statreq,STAT_ATIV)==0){
                                         strcpy(req[i].statreq,STAT_CONC);
                                         
@@ -260,6 +262,7 @@ int main()
                                     }
                                 }while(req[pc].prazreal < 0);
                                 portateis[req[pc].indiceport].ultimadev = req[pc].devol;
+                                portateis[req[pc].indiceport].quantDiasReq +=req[pc].prazreal;
                                 printf("\n\tLocal de devolucao: ");
                                 do{
                                     lerString(req[pc].local,NMAXX);
@@ -320,10 +323,29 @@ int main()
                 }
                 break;
             case 'Y':
+                if(oscontadores.portatedisp >0){
+                    printf("\n\tID da requisicao: ");
+                    lerString(rqcode,NMAXX);
+                    for(aux = oscontadores.totalderequisefet-1;aux >=0;aux--){
+                        if(rqcode == req[aux].requiscode){
+                            if(strcmp(portateis[req[aux].indiceport].stat,STAT_REQ)==0){
+                                if(strcmp(req[aux].statreq,STAT_ATIV)==0){
 
-
-
-
+                                    req[aux].requis = sumD(req[aux].requis,SETE);
+                                    req[aux].numpraz = req[aux].numpraz + 7;
+                                    printf("\n\tNova Data Prazo: %d - %d - %d",req[aux].requis.dia,req[aux].requis.mes,req[aux].requis.ano);
+                                    aux = -1;
+                                }
+                                else{
+                                    printf("\n\tErro requisicao concluida.\n");
+                                }
+                            }
+                            else{
+                                printf("\n\tErro portatil nao requisitado!\n");
+                            }
+                        }
+                    }
+                }
                 break;
             case 'G':
                 gravarFicheiroBinario(oscontadores, portateis,req,ava);
@@ -558,8 +580,8 @@ void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava){     //
     int i=0,u=0,indice = -1;
     AVARIAs *a;
     a = ava;
-    printf("\n\t%d",cont->totaldeavarias+1);
-    ava = realloc(ava,(cont->totaldeavarias+1)*sizeof(AVARIAs));
+    
+    ava = realloc(ava , (cont->totaldeavarias+1)*sizeof(AVARIAs));
     if(ava == NULL){
         printf("\nMemoria indisponivel.\n ");
         ava = a;
@@ -867,6 +889,7 @@ void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava){
         for(i = (*cont).portatexist; i<u; i++){
             port[i].quantAvarias = 0;
             port[i].quantDev = 0;
+            port[i].quantDiasReq=0;
             printf("\n\n\tId: ");
             do{
                 tempid = lerInteiro(UM,MAXIMUS);
@@ -1427,6 +1450,92 @@ int subtrairDatas(DATa d1, DATa d2){
         numerodedias = -1;
     }
     return numerodedias;
+}
+
+DATa sumD(DATa d1, int d){
+    int aux,aux1,aux2,aux3;
+    DATa data;
+    switch(d1.mes){
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+            aux = d1.dia+7;
+            aux1 = aux -31;
+            if(aux1>0){
+                data.mes = d1.mes +1;
+                data.dia = aux1;
+                data.ano = d1.ano;
+            }
+            else{
+                data.mes = d1.mes;
+                data.dia = aux,
+                data.ano = d1.ano;
+            }
+            break;
+        case 12:
+            aux = d1.dia+7;
+            aux1 = aux -31;
+            if(aux1 > 0){
+                data.mes = 1;
+                data.dia = aux1;
+                data.ano = d1.ano++;
+            }
+            else{
+                data.dia = aux;
+                data.mes = d1.mes;
+                data.ano = d1.ano;
+            }
+            break;
+        case 2:
+            if((d1.ano%400==0) || (d1.ano%4==0 && d1.ano%100!=0)){
+                aux =d1.dia+7 ;
+                aux1 = aux -29;
+                if(aux1 >0){
+                    data.mes = d1.mes++;
+                    data.dia = aux1;
+                    data.ano =d1.ano;
+                }
+                else{
+                    data.mes = d1.mes;
+                    data.dia = aux;
+                    data.ano = d1.ano;
+                }
+            }
+            else{
+                aux = d1.dia + 7;
+                aux1 = aux -28;
+                if(aux1 > 0){
+                    data.mes = d1.mes++;
+                    data.dia = aux1;
+                    data.ano = d1.ano;
+                }
+                else{
+                    data.mes = d1.mes;
+                    data.dia = aux;
+                    data.ano = d1.ano;
+                }
+            }
+            break;
+
+        
+        default:
+            aux = d1.dia+7;
+            aux1 = aux -30;
+            if(aux1>0){
+                data.mes = d1.mes +1;
+                data.dia = aux1;
+                data.ano = d1.ano;
+            }
+            else{
+                data.mes = d1.mes;
+                data.dia = aux,
+                data.ano = d1.ano;
+            }
+    }
+    return data;
 }
 
 DATa lerData(void){
