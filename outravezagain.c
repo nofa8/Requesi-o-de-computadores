@@ -881,6 +881,9 @@ void listaReq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
 
         }
     }
+    else{
+        printf("\nErro! Nao existem requisicoes.\n");
+    }
 }
 
 //Tá bom! ! !
