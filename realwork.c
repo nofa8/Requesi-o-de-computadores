@@ -133,9 +133,9 @@ char menu(CONTADOREs *cont,PORTATIl port[MAXX]);
 void subListar(CONTADOREs *cont, PORTATIl port1[MAXX], REQUi *req, AVARIAs *ava);
 
 void lePortate(CONTADOREs *cont, PORTATIl port2[MAXX], REQUi *req);
-void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava);
+AVARIAs *regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava);
 void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice, AVARIAs *ava);
-void regRq(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
+REQUi *regRq(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
 void insertPCs(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req,AVARIAs *ava);
 void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req);
@@ -176,7 +176,7 @@ int main()
                 subListar(&oscontadores, portateis, req,ava);
                 break;
             case 'R':
-                regRq(&oscontadores, portateis,req);
+                req = regRq(&oscontadores, portateis,req);
                 break;
             case 'V':
                 if((oscontadores.portatexist == 0)){
@@ -202,12 +202,12 @@ int main()
                     }
                     else{
                         if(strcmp(portateis[conf].stat,STAT_DISP)==0){  // conf indica o vetor do port
-                            regAva(&oscontadores,portateis,conf,ava);
+                            ava = regAva(&oscontadores,portateis,conf,ava);
                             strcpy(portateis[conf].stat,STAT_AVA);
                             oscontadores.portatedisp--;
                         }
                         if(strcmp(portateis[conf].stat,STAT_REQ)==0){
-                            regAva(&oscontadores,portateis,conf,ava);
+                            ava = regAva(&oscontadores,portateis,conf,ava);
                             strcpy(portateis[conf].stat,STAT_AVA);
                             for( i = oscontadores.totalderequisefet; i >=0;i--){
                                 if(req[i].portid == portateis[conf].portId){
@@ -582,7 +582,7 @@ void regRep(CONTADOREs *cont, PORTATIl port[MAXX], int indice, AVARIAs *ava){   
 }
 
 //falta so ver o comentario
-void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava){     //confirmar valor de indice
+AVARIAs *regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava){     //confirmar valor de indice
     int i=0,u=0,indice = -1;
     AVARIAs *a;
     a = ava;
@@ -619,10 +619,11 @@ void regAva(CONTADOREs *cont, PORTATIl port[MAXX],int ind, AVARIAs *ava){     //
         port[indice].quantAvarias++;
         (cont->totaldeavarias)++;
     }
+    return ava;
 }
 //PROBLEMATICA, nao mostra mensagem de erro em data de requisicao, loop na data de devolucao
 //grande parte esta dentro do for, deviamos mudar
-void regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
+REQUi *regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
     int i= 0,l=0,h = 0,u = 0,idTemporario = 0, indice=-1, numutente = 0, date = 0;
     REQUi *r;
     r = req;
@@ -863,6 +864,7 @@ void regRq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
         }
 
     }
+    return req;
 }
 //arrebenta, !!
 void listaReq(CONTADOREs *cont, PORTATIl port[MAXX],REQUi *req){
@@ -1097,7 +1099,7 @@ void dadosEstatisticos(CONTADOREs *cont, PORTATIl port[MAXX], REQUi *req){      
         }
         break;
     case 4:
-        if(cont->totalderequisefet!=0){      //ids possui ids de pcs já  registados e devolvidos
+        if(cont->totalderequisefet!=0){
             for(aux3 = 0;aux3<cont->totalderequisefet;aux3++){
                 if(strcmp(req[aux3].statreq,STAT_CONC)){
                     auxdata = subtrairDatas(base,req[aux3].devol);
